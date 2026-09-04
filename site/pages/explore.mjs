@@ -48,69 +48,73 @@ export function renderExplore({ cases, planned, knowledge }) {
     source: item.key,
     target: `knowledge:${knowledgeId}`
   })));
-  const types = new Set(knowledge.map(item => item.epistemicType)).size;
-
   const data = { schemaVersion: 1, nodes, edges };
   const body = `<section class="atlas-explorer" data-atlas-explorer>
     <script type="application/json" data-atlas-data>${scriptJson(data)}</script>
     <header class="explorer-intro wrap">
       <div>
-        <p class="kicker">Interactive knowledge map</p>
-        <h1>从问题出发，<br><em>沿关系理解知识。</em></h1>
-        <p>Case 是入口，Knowledge 是可复用的解释。选择任意节点，查看它连接的问题、假设边界与工程含义。</p>
+        <p class="kicker">Systems field atlas · plate 001</p>
+        <h1>系统研究图谱</h1>
       </div>
-      <div class="explorer-stats" aria-label="Atlas statistics">
-        <div><b>${caseNodes.length}</b><span>Cases</span><small>${cases.length} executable · ${planned.length} planned</small></div>
-        <div><b>${knowledgeNodes.length}</b><span>Knowledge</span><small>${types} epistemic types</small></div>
-        <div><b>${edges.length}</b><span>Relations</span><small>Case → Knowledge</small></div>
-      </div>
+      <p>从一个真实问题开始。拖动地图、沿连线跳转，观察不同知识如何共同解释同一类系统行为。</p>
     </header>
 
     <div class="explorer-controls-wrap">
       <div class="explorer-controls wrap">
         <label class="explorer-search">
-          <span>SEARCH</span>
-          <input type="search" data-atlas-search placeholder="搜索问题、知识点或英文名…" autocomplete="off" />
+          <span>⌕</span>
+          <input type="search" data-atlas-search placeholder="搜索一个问题或概念" autocomplete="off" />
           <kbd>⌘ K</kbd>
         </label>
         <div class="explorer-filters" role="group" aria-label="Filter atlas nodes">
-          <button type="button" class="is-active" data-atlas-filter="all" aria-pressed="true">全部 <span>${nodes.length}</span></button>
-          <button type="button" data-atlas-filter="case" aria-pressed="false">Cases <span>${caseNodes.length}</span></button>
-          <button type="button" data-atlas-filter="knowledge" aria-pressed="false">Knowledge <span>${knowledgeNodes.length}</span></button>
+          <button type="button" class="is-active" data-atlas-filter="all" aria-pressed="true">全图 <span>${nodes.length}</span></button>
+          <button type="button" data-atlas-filter="case" aria-pressed="false">问题 <span>${caseNodes.length}</span></button>
+          <button type="button" data-atlas-filter="knowledge" aria-pressed="false">知识 <span>${knowledgeNodes.length}</span></button>
           <button type="button" data-atlas-filter="published" aria-pressed="false">已发布 <span>${knowledgeNodes.length + cases.length}</span></button>
         </div>
-        <button type="button" class="explorer-reset" data-atlas-reset>重置视图</button>
+        <span class="explorer-result-count" data-atlas-result-count>${nodes.length} NODES</span>
+        <button type="button" class="explorer-reset" data-atlas-reset>RESET</button>
       </div>
     </div>
 
     <div class="explorer-workspace wrap">
+      <aside class="atlas-rail" aria-label="Suggested starting points">
+        <div class="atlas-rail-head"><small>起点索引</small><span>01—04</span></div>
+        <button type="button" data-atlas-suggest="case:tests-green-wrong"><i>01</i><span><small>VERIFY</small>测试全绿，为什么仍可能是错的？</span></button>
+        <button type="button" data-atlas-suggest="knowledge:pearl-causal-hierarchy"><i>02</i><span><small>DEBUG</small>“改完变好”能证明因果吗？</span></button>
+        <button type="button" data-atlas-suggest="knowledge:littles-law"><i>03</i><span><small>CONTROL</small>更多并发为何不一定更快？</span></button>
+        <button type="button" data-atlas-suggest="knowledge:simon-stable-intermediates"><i>04</i><span><small>BUILD</small>复杂系统如何逐步长出来？</span></button>
+        <p><b>图例</b><span><i class="case-dot"></i>问题 / Case</span><span><i class="knowledge-dot"></i>知识 / Knowledge</span><span><i class="planned-dot"></i>路线图 / Planned</span></p>
+      </aside>
+
       <section class="atlas-map-card" aria-labelledby="atlas-map-title">
         <div class="atlas-map-head">
-          <div><small>RELATION MAP</small><h2 id="atlas-map-title">问题与知识的双向索引</h2></div>
-          <div class="atlas-legend"><span><i class="case-dot"></i>Case</span><span><i class="knowledge-dot"></i>Knowledge</span><span><i class="planned-dot"></i>Planned</span></div>
+          <div><small>RELATION FIELD</small><h2 id="atlas-map-title" data-atlas-map-context>全部问题与知识</h2></div>
+          <div class="atlas-map-tools" aria-label="Map controls">
+            <button type="button" data-atlas-zoom-out aria-label="Zoom out">−</button>
+            <button type="button" data-atlas-fit>适应</button>
+            <button type="button" data-atlas-zoom-in aria-label="Zoom in">＋</button>
+          </div>
         </div>
-        <div class="atlas-canvas" data-atlas-canvas>
-          <svg viewBox="0 0 1000 760" preserveAspectRatio="none" aria-hidden="true" data-atlas-edges></svg>
-          <div class="atlas-node-layer" data-atlas-nodes></div>
+        <div class="atlas-canvas" data-atlas-canvas role="region" aria-label="可拖动和缩放的知识关系图">
+          <div class="atlas-world" data-atlas-world>
+            <svg aria-hidden="true" data-atlas-edges></svg>
+            <div class="atlas-node-layer" data-atlas-nodes></div>
+          </div>
           <div class="atlas-empty" data-atlas-empty hidden>没有匹配的节点。试试更短的关键词。</div>
         </div>
-        <p class="atlas-map-help">点击节点聚焦一跳关系；再次点击空白处返回全图。键盘可用 Tab 选择节点。</p>
+        <p class="atlas-map-help"><span>拖动空白处平移 · Ctrl / ⌘ + 滚轮缩放 · 拖动节点重新排布</span><b>选择节点查看一跳关系</b></p>
       </section>
 
       <aside class="atlas-inspector" data-atlas-inspector aria-live="polite">
         <div class="inspector-empty">
-          <span>SELECT A NODE</span>
-          <h2>选择一个问题或知识点</h2>
-          <p>这里会显示定义、适用边界、关联节点，以及可继续打开的完整页面。</p>
-          <div class="inspector-prompt"><small>可以从这里开始</small><button type="button" data-atlas-suggest="case:tests-green-wrong">为什么测试全绿，任务仍可能是错的？</button></div>
+          <span>FIELD NOTE · —</span>
+          <h2>选择地图上的一个节点</h2>
+          <p>右侧将成为它的研究批注：定义、边界、工程含义，以及沿关系继续探索的路径。</p>
+          <div class="inspector-coordinate"><small>ATLAS COORDINATE</small><b>CASE ↔ KNOWLEDGE</b><span>${caseNodes.length} problems · ${knowledgeNodes.length} concepts · ${edges.length} links</span></div>
         </div>
       </aside>
     </div>
-
-    <section class="atlas-list-section wrap" aria-labelledby="atlas-list-title">
-      <div class="atlas-list-head"><div><small>FILTERED INDEX</small><h2 id="atlas-list-title">当前视图</h2></div><span data-atlas-result-count>${nodes.length} nodes</span></div>
-      <div class="atlas-result-list" data-atlas-list></div>
-    </section>
     <noscript><p class="wrap atlas-noscript">关系图需要 JavaScript；你仍可通过导航中的 Knowledge 浏览全部知识对象。</p></noscript>
   </section>
   <script type="module" src="../assets/explorer.js"></script>`;

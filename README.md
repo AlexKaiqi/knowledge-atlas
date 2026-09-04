@@ -16,6 +16,7 @@ The product unit is an **Executable Case**: the user gives an Agent a task, chan
 Requires Node.js 20+.
 
 ```bash
+npm ci
 npm run check   # validate + runtime tests + build
 npm run serve
 ```
@@ -28,6 +29,8 @@ The generated site includes:
 - `/data/registry.json` — public object and relation registry
 - `/data/agent-context.json` — complete structured context for an Agent Provider
 - `/llms.txt` and `/llms-full.txt` — Agent-readable discovery and corpus files
+
+The relationship explorer keeps the generated-site architecture: D3 submodules provide force layout, drag, and zoom; Motion provides small state transitions; esbuild bundles those dependencies into the static Pages artifact.
 
 ## Common maintenance commands
 

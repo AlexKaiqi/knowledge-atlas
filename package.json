@@ -14,5 +14,15 @@
     "promote:case": "node scripts/promote-case.mjs",
     "publish:knowledge": "node scripts/publish-knowledge.mjs",
     "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "d3-drag": "3.0.0",
+    "d3-force": "3.0.0",
+    "d3-selection": "3.0.0",
+    "d3-zoom": "3.0.0",
+    "motion": "13.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

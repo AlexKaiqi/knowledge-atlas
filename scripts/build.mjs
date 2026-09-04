@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { build as bundle } from 'esbuild';
 import { root, readJson, write, copyDir } from './lib.mjs';
 import { renderHome } from '../site/pages/home.mjs';
 import { renderCase } from '../site/pages/case.mjs';
@@ -141,6 +142,16 @@ await write('dist/llms-full.txt',llmsFull({cases,planned,knowledge}));
 
 await write('dist/method/index.html',renderMethod());
 await copyDir('site/assets','dist/assets');
+await bundle({
+  entryPoints:[path.join(root,'site/assets/explorer.js')],
+  outfile:path.join(root,'dist/assets/explorer.js'),
+  bundle:true,
+  format:'esm',
+  target:['es2022'],
+  minify:true,
+  legalComments:'none',
+  logLevel:'silent'
+});
 await copyDir('site/runtime','dist/runtime');
 await write('dist/.nojekyll','');
 console.log(`Built dist/: ${cases.length} case page(s), ${knowledge.length} knowledge page(s).`);

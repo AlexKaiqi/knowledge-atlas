@@ -56,6 +56,23 @@ npm run check
 
 Draft objects are validated but are not rendered into the public Atlas until promoted/published.
 
+## Formal verification
+
+The independent Lean 4 project in [`formal/`](./formal/) machine-checks the
+static possibility-allocation model and its dynamic attention-market extension.
+Its accompanying notes state the assumptions, derivations, and non-implications
+of the verified results.
+
+```bash
+cd formal
+lake build
+```
+
+Start with:
+
+- [Static possibility allocation](./formal/POSSIBILITY_ALLOCATION.md)
+- [Dynamic attention and Matcher routing](./formal/DYNAMIC_ATTENTION.md)
+
 ## Source of truth
 
 ```text

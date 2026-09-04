@@ -1,0 +1,29 @@
+{
+  "id": "bayesian-odds",
+  "title": "Bayesian Odds",
+  "titleZh": "贝叶斯后验赔率",
+  "epistemicType": "FORMAL_RESULT",
+  "summary": "在明确概率模型下，用似然比把先验赔率更新为后验赔率。",
+  "formula": "O(H|E) = O(H) × P(E|H) / P(E|¬H)",
+  "statement": "多份证据可以连续更新信念；只有在相应条件独立结构成立时，多个似然比才可直接连乘。",
+  "assumptions": [
+    "概率模型与假设空间已定义",
+    "用于连乘的证据满足相应的条件独立结构，或使用条件似然逐项更新"
+  ],
+  "doesNotImply": [
+    "证据数量越多可信度就一定越高",
+    "共享同一 Oracle 的多个测试可以被视为独立证据",
+    "人为指定的教学似然比就是客观真值"
+  ],
+  "engineeringImplications": [
+    "优先寻找 failure mechanism 不重叠的证据",
+    "记录证据 provenance，而不是只记录自然语言结论"
+  ],
+  "sources": [
+    {
+      "label": "Bayes' theorem",
+      "url": "https://en.wikipedia.org/wiki/Bayes%27_theorem"
+    }
+  ],
+  "status": "published"
+}

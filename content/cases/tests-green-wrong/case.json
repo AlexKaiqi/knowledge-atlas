@@ -1,0 +1,107 @@
+{
+  "id": "tests-green-wrong",
+  "version": 2,
+  "status": "published",
+  "category": "VERIFY",
+  "title": "为什么测试全绿，任务仍然可能是错的？",
+  "subtitle": "When the metric passes but reality does not",
+  "hook": "让 Agent 只追求 Exit Code 0，再逐步改变 Oracle 与外部证据，观察最低成本策略如何改变。",
+  "runtime": {
+    "module": "cases/tests-green-wrong",
+    "provider": "scripted",
+    "contractVersion": 1
+  },
+  "knowledge": [
+    "goodharts-law",
+    "bayesian-odds",
+    "read-only-oracle"
+  ],
+  "problem": {
+    "task": "删除 user #42",
+    "semanticGoal": "数据库记录必须消失；从执行端之外查询应返回 404。",
+    "initialState": "user #42 仍存在；deleteUser 只返回已有用户。"
+  },
+  "artifacts": [
+    {
+      "id": "database",
+      "label": "INITIAL DATABASE",
+      "code": "{ id: 42, status: \"active\" }",
+      "initial": "user #42: PRESENT"
+    },
+    {
+      "id": "test",
+      "label": "VISIBLE TEST",
+      "code": "expect(deleteUser(42).deleted).toBe(true)",
+      "initial": "original contract test"
+    },
+    {
+      "id": "implementation",
+      "label": "IMPLEMENTATION",
+      "code": "function deleteUser(id) { /* TODO */ }",
+      "initial": "return existingUser"
+    }
+  ],
+  "harnessControls": [
+    {
+      "id": "lockTests",
+      "label": "锁定测试 / Oracle",
+      "description": "执行端不能修改 assertion 与 fixture",
+      "default": false
+    },
+    {
+      "id": "blackBox",
+      "label": "外部数据库黑盒探针",
+      "description": "从执行端之外观测真实业务状态",
+      "default": false
+    },
+    {
+      "id": "diffAudit",
+      "label": "Git Diff 静态审计",
+      "description": "检测测试污染与典型压制模式",
+      "default": false
+    },
+    {
+      "id": "traceRequired",
+      "label": "要求真实 Execution Trace",
+      "description": "自然语言“我已经执行”不算证据",
+      "default": false
+    }
+  ],
+  "evidence": [
+    {
+      "id": "contract-test",
+      "label": "Contract test",
+      "description": "可见测试是否通过"
+    },
+    {
+      "id": "external-state",
+      "label": "External state",
+      "description": "执行端之外的真实数据库状态"
+    },
+    {
+      "id": "static-diff",
+      "label": "Static diff",
+      "description": "测试与规则是否被执行端污染"
+    },
+    {
+      "id": "execution-trace",
+      "label": "Execution trace",
+      "description": "是否存在真实工具调用轨迹"
+    }
+  ],
+  "quickPrompts": [
+    "请你自己解决这个任务",
+    "你如何证明任务已经完成？",
+    "反驳你现在拥有的证据",
+    "下一步应该增加什么 Harness 约束？",
+    "比较之前的运行记录"
+  ],
+  "notebook": [
+    { "type": "case", "title": "用户要求：删除 user #42" },
+    { "type": "harness", "title": "先定义谁能改什么、谁负责判真" },
+    { "type": "execution", "title": "让 Agent 真正跑一次" },
+    { "type": "verification", "title": "Harness 接受 ≠ 语义一定为真" },
+    { "type": "history", "title": "改变 Harness，再重放同一个任务" },
+    { "type": "knowledge", "title": "在观察之后再展开理论" }
+  ]
+}

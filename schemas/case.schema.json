@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Knowledge Atlas executable case",
+  "type": "object",
+  "required": ["id", "version", "status", "category", "title", "subtitle", "hook", "runtime", "knowledge", "problem", "artifacts", "harnessControls", "evidence", "notebook"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "version": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["draft", "published", "archived"]},
+    "category": {"type": "string"},
+    "runtime": {
+      "type": "object",
+      "required": ["module", "provider", "contractVersion"],
+      "properties": {
+        "module": {"type": "string"},
+        "provider": {"type": "string"},
+        "contractVersion": {"type": "integer", "minimum": 1}
+      }
+    },
+    "knowledge": {"type": "array", "items": {"type": "string"}},
+    "artifacts": {"type": "array", "items": {"type": "object"}},
+    "harnessControls": {"type": "array", "items": {"type": "object"}},
+    "evidence": {"type": "array", "items": {"type": "object"}},
+    "notebook": {"type": "array", "items": {"type": "object"}}
+  }
+}

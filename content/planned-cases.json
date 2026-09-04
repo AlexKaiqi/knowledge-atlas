@@ -1,0 +1,42 @@
+[
+  {
+    "id": "too-many-agents",
+    "category": "CONTROL",
+    "title": "为什么 Agent 越多，交付反而可能越慢？",
+    "subtitle": "Concurrency is not free speedup",
+    "hook": "让 Agent 自己调度并发任务，再用 WIP、吞吐率与瓶颈 telemetry 检验策略。",
+    "knowledge": ["littles-law", "amdahls-law"]
+  },
+  {
+    "id": "debugging-loop",
+    "category": "DEBUG",
+    "title": "为什么反复试错，还是找不到根因？",
+    "subtitle": "Debugging as information acquisition",
+    "hook": "把故障藏进链路，让 Agent 自己选择下一次 probe，并比较 trial-and-error 与信息增益策略。",
+    "knowledge": ["shannon-information", "pearl-causal-hierarchy"]
+  },
+  {
+    "id": "patch-on-patch",
+    "category": "BUILD",
+    "title": "为什么 Agent 越修，系统越像补丁套补丁？",
+    "subtitle": "Legacy context changes the search distribution",
+    "hook": "给同一需求提供/屏蔽 legacy context，比较两条设计轨迹与可验证结果。",
+    "knowledge": ["prior-context-effects"]
+  },
+  {
+    "id": "big-bang-synthesis",
+    "category": "BUILD",
+    "title": "为什么“大而全一次上线”经常启动不起来？",
+    "subtitle": "Stable intermediate forms vs big-bang synthesis",
+    "hook": "比较 big-bang 与 walking skeleton 的可恢复中间态。",
+    "knowledge": ["simon-stable-intermediates"]
+  },
+  {
+    "id": "causal-false-positive",
+    "category": "DEBUG",
+    "title": "为什么“改了 X 后好了”仍然不代表 X 是根因？",
+    "subtitle": "Association is not intervention",
+    "hook": "通过可控混杂与干预，区分相关、干预和反事实。",
+    "knowledge": ["pearl-causal-hierarchy"]
+  }
+]

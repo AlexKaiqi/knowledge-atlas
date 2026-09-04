@@ -1,0 +1,29 @@
+{
+  "id": "littles-law",
+  "title": "Little's Law",
+  "titleZh": "李特尔法则",
+  "epistemicType": "FORMAL_RESULT",
+  "summary": "在合适的稳态条件下，系统平均在制品数等于有效吞吐率乘以平均停留时间。",
+  "formula": "L = λW",
+  "statement": "Average number in system = average effective arrival rate × average time in system.",
+  "assumptions": [
+    "长期平均量存在",
+    "采用与 Little's Law 相容的稳定/守恒条件"
+  ],
+  "doesNotImply": [
+    "WIP 必须等于 1",
+    "并发必然有害",
+    "降低 WIP 是缩短交付周期的唯一方法"
+  ],
+  "engineeringImplications": [
+    "当吞吐率近似固定时，降低平均 WIP 会降低平均 cycle time",
+    "WIP limit 是一种工程策略，而不是定理本身"
+  ],
+  "sources": [
+    {
+      "label": "John D. C. Little (1961), A Proof for the Queuing Formula: L = λW",
+      "url": "https://doi.org/10.1287/opre.9.3.383"
+    }
+  ],
+  "status": "published"
+}

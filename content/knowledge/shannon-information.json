@@ -1,0 +1,27 @@
+{
+  "id": "shannon-information",
+  "title": "Shannon Information",
+  "titleZh": "香农熵与信息增益",
+  "epistemicType": "FORMAL_RESULT",
+  "summary": "熵量化不确定性；理想二元观测在两种结果等概率时可提供最多 1 bit 信息。",
+  "formula": "H(X) = -Σ p(x) log₂ p(x)",
+  "statement": "For a binary variable, entropy is maximized at p = 0.5 and equals 1 bit.",
+  "assumptions": [
+    "候选假设和观测分布可以被概率化描述"
+  ],
+  "doesNotImply": [
+    "现实调试必须机械寻找 50/50 点",
+    "每次 probe 都无噪声且代价相同"
+  ],
+  "engineeringImplications": [
+    "调试应优先选择单位成本期望信息增益高的 probe",
+    "在近似均匀、无噪声、等成本候选中，二分测试可达到对数级定位"
+  ],
+  "sources": [
+    {
+      "label": "Claude Shannon (1948), A Mathematical Theory of Communication",
+      "url": "https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf"
+    }
+  ],
+  "status": "published"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "prior-context-effects",
+  "title": "Prior / Context Effects",
+  "titleZh": "先验锚定与上下文效应",
+  "epistemicType": "EMPIRICAL_HEURISTIC",
+  "summary": "既有实现、近期上下文和提示结构会改变 Agent 的搜索与生成分布。",
+  "statement": "Existing context can bias the space of solutions an autoregressive agent proposes and iterates on.",
+  "assumptions": [
+    "Agent 的决策依赖提供的上下文",
+    "上下文包含已有实现或近期轨迹"
+  ],
+  "doesNotImply": [
+    "存在一个普适的概率不等式证明 legacy context 必然压制 first-principles solution",
+    "长上下文必然导致性能单调下降"
+  ],
+  "engineeringImplications": [
+    "架构推演可使用 context masking / zero-base scoping 作为对照实验",
+    "把顶层不变量外置并重复注入执行环境"
+  ],
+  "sources": [],
+  "status": "published"
+}

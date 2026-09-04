@@ -1,0 +1,29 @@
+{
+  "id": "amdahls-law",
+  "title": "Amdahl's Law",
+  "titleZh": "阿姆达尔定律",
+  "epistemicType": "FORMAL_MODEL",
+  "summary": "固定工作负载下，未被加速的部分限制整体可获得的最大加速比。",
+  "formula": "S = 1 / ((1-p) + p/s)",
+  "statement": "Improving only a fraction p of a workload has a system-level speedup bounded by the remaining unaccelerated fraction.",
+  "assumptions": [
+    "固定 workload",
+    "p 表示可被所讨论优化加速的工作占比",
+    "s 表示该部分的局部加速比"
+  ],
+  "doesNotImply": [
+    "只能优化所谓关键路径",
+    "任何增加并行度都无意义"
+  ],
+  "engineeringImplications": [
+    "优化前应先确认待优化部分在总成本中的占比",
+    "系统瓶颈需要 telemetry，而不是凭直觉选择"
+  ],
+  "sources": [
+    {
+      "label": "Gene Amdahl (1967), Validity of the Single Processor Approach...",
+      "url": "https://dl.acm.org/doi/10.1145/1465482.1465560"
+    }
+  ],
+  "status": "published"
+}

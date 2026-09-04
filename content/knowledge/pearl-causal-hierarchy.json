@@ -1,0 +1,26 @@
+{
+  "id": "pearl-causal-hierarchy",
+  "title": "Pearl's Causal Hierarchy",
+  "titleZh": "珀尔因果阶梯",
+  "epistemicType": "FORMAL_MODEL",
+  "summary": "关联、干预和反事实是不同层级的因果查询；观察条件概率不能自动替代干预。",
+  "formula": "P(Y|X) ≠ P(Y|do(X)) in general",
+  "statement": "Observational association does not in general identify the effect of an intervention.",
+  "assumptions": [
+    "因果问题需要一个足以表达干预/混杂结构的模型或实验设计"
+  ],
+  "doesNotImply": [
+    "一次 leave-one-out ablation 就自动识别了因果关系"
+  ],
+  "engineeringImplications": [
+    "把相关性发现与因果根因区分开",
+    "设计干净的干预、对照和混杂检查"
+  ],
+  "sources": [
+    {
+      "label": "Judea Pearl — The Three-Layer Causal Hierarchy",
+      "url": "https://causality.cs.ucla.edu/blog/index.php/2016/07/09/the-three-layer-causal-hierarchy/"
+    }
+  ],
+  "status": "published"
+}

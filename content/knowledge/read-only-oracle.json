@@ -1,0 +1,22 @@
+{
+  "id": "read-only-oracle",
+  "title": "Read-only Oracle",
+  "titleZh": "只读裁判隔离",
+  "epistemicType": "ENGINEERING_POLICY",
+  "summary": "把执行权与最终判定权拆开，使执行端不能通过修改评测本身获得成功。",
+  "statement": "The executor may invoke the acceptance oracle, but cannot mutate the oracle, its fixtures, or the expected outcome.",
+  "assumptions": [
+    "存在可独立运行的验收边界",
+    "Oracle 本身覆盖了至少一部分真实语义"
+  ],
+  "doesNotImply": [
+    "Oracle 只读就等于语义正确",
+    "单一 Oracle 足以证明所有复杂任务完成"
+  ],
+  "engineeringImplications": [
+    "测试文件、验收阈值、关键 fixture 不属于 executor 的写空间",
+    "引入外部 observer 检查真实状态"
+  ],
+  "sources": [],
+  "status": "published"
+}

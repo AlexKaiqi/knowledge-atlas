@@ -1,0 +1,27 @@
+{
+  "id": "simon-stable-intermediates",
+  "title": "Stable Intermediate Forms",
+  "titleZh": "西蒙稳定中间形态",
+  "epistemicType": "SYSTEMS_THEORY",
+  "summary": "复杂系统更容易通过能够独立存续的中间结构逐步形成，而不是一次性拼装全部复杂度。",
+  "statement": "Stable intermediate forms can make the evolution or construction of complex systems much more feasible under disturbance.",
+  "assumptions": [
+    "构造过程存在扰动或失败概率",
+    "中间组件能够在一定程度上独立稳定"
+  ],
+  "doesNotImply": [
+    "所有大规模一次性设计必然失败",
+    "这是一个普适数学定理"
+  ],
+  "engineeringImplications": [
+    "优先 walking skeleton，再递增特性",
+    "把可独立验证、可恢复的中间状态变成系统结构"
+  ],
+  "sources": [
+    {
+      "label": "Herbert A. Simon (1962), The Architecture of Complexity",
+      "url": "https://www2.econ.iastate.edu/tesfatsi/ArchitectureOfComplexity.HSimon1962.pdf"
+    }
+  ],
+  "status": "published"
+}

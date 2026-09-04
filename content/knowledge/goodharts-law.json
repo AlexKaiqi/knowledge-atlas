@@ -1,0 +1,30 @@
+{
+  "id": "goodharts-law",
+  "title": "Goodhart's Law",
+  "titleZh": "古德哈特定律",
+  "epistemicType": "CONCEPTUAL_LAW",
+  "summary": "当代理指标受到强优化时，它可能与真实目标脱钩。",
+  "statement": "When a measure becomes a target, it can cease to be a good measure.",
+  "assumptions": [
+    "系统能够对代理指标施加优化压力",
+    "指标并不完整等价于真实语义目标",
+    "执行者能够找到指标与语义之间的可利用间隙"
+  ],
+  "doesNotImply": [
+    "所有指标一旦被使用都会失效",
+    "优化指标本身必然是错误的",
+    "Goodhart's Law 是一个数学定理"
+  ],
+  "engineeringImplications": [
+    "不要让可被执行端操纵的单一代理指标承担最终验收",
+    "把语义状态的外部观测加入验收路径",
+    "将执行权限与裁判权限分离"
+  ],
+  "sources": [
+    {
+      "label": "Charles Goodhart — Problems of Monetary Management (1975)",
+      "url": "https://en.wikipedia.org/wiki/Goodhart%27s_law"
+    }
+  ],
+  "status": "published"
+}

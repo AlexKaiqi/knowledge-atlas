@@ -7,7 +7,8 @@ set_option linter.style.header false
 
 The decision space `E` is arbitrary; it can represent densities or probability measures once the
 appropriate vector-space model is chosen. Each demand observes a linear moment of the decision and
-assigns a concave value to that moment.
+assigns a concave value to that moment. Value functions are represented on `ℝ`, but all regularity
+assumptions are restricted to the image of the feasible set; values outside that image are unused.
 -/
 
 open Set
@@ -35,7 +36,7 @@ noncomputable def regularizedObjective (system : DemandSystem I E)
 /-- A finite sum of concave values of linear moments is concave on every convex feasible set. -/
 theorem welfare_concaveOn (system : DemandSystem I E) {K : Set E}
     (hK : Convex ℝ K)
-    (hValue : ∀ i, ConcaveOn ℝ Set.univ (system.value i)) :
+    (hValue : ∀ i, ConcaveOn ℝ (system.moment i '' K) (system.value i)) :
     ConcaveOn ℝ K system.welfare := by
   classical
   refine ⟨hK, ?_⟩
@@ -44,17 +45,18 @@ theorem welfare_concaveOn (system : DemandSystem I E) {K : Set E}
   rw [Finset.smul_sum, Finset.smul_sum, ← Finset.sum_add_distrib]
   apply Finset.sum_le_sum
   intro i hi
-  simpa using (hValue i).2 (Set.mem_univ _) (Set.mem_univ _) ha hb hab
+  simpa using (hValue i).2 ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩ ha hb hab
 
-/-- Continuous moments and continuous values produce continuous aggregate welfare. -/
-theorem welfare_continuous [TopologicalSpace E] (system : DemandSystem I E)
-    (hMoment : ∀ i, Continuous (system.moment i))
-    (hValue : ∀ i, Continuous (system.value i)) :
-    Continuous system.welfare := by
+/-- Continuity of moments on the feasible set and values on their attainable images suffices. -/
+theorem welfare_continuousOn [TopologicalSpace E] (system : DemandSystem I E)
+    {K : Set E}
+    (hMoment : ∀ i, ContinuousOn (system.moment i) K)
+    (hValue : ∀ i, ContinuousOn (system.value i) (system.moment i '' K)) :
+    ContinuousOn system.welfare K := by
   classical
-  apply continuous_finsetSum
+  apply continuousOn_finsetSum
   intro i hi
-  exact (hValue i).comp (hMoment i)
+  exact (hValue i).comp (hMoment i) (fun x hx ↦ ⟨x, hx, rfl⟩)
 
 /-- Multiplication by a positive KL coefficient preserves strict convexity. -/
 theorem positive_scale_strictConvexOn {K : Set E} {resistance : E → ℝ}
@@ -73,7 +75,7 @@ theorem existsUnique_regularized_solution [TopologicalSpace E]
     (hKne : K.Nonempty) (hKcompact : IsCompact K)
     (hObjectiveUsc : UpperSemicontinuousOn
       (system.regularizedObjective resistance ρ) K)
-    (hValueConcave : ∀ i, ConcaveOn ℝ Set.univ (system.value i))
+    (hValueConcave : ∀ i, ConcaveOn ℝ (system.moment i '' K) (system.value i))
     (hResistanceStrict : StrictConvexOn ℝ K resistance)
     (hρ : 0 < ρ) :
     ∃! x : E,
@@ -93,13 +95,13 @@ theorem existsUnique_regularized_solution [TopologicalSpace E]
 semicontinuous. This is the natural direction for KL in a weak topology. -/
 theorem regularizedObjective_upperSemicontinuousOn [TopologicalSpace E]
     (system : DemandSystem I E) {K : Set E} {resistance : E → ℝ} {ρ : ℝ}
-    (hMoment : ∀ i, Continuous (system.moment i))
-    (hValue : ∀ i, Continuous (system.value i))
+    (hMoment : ∀ i, ContinuousOn (system.moment i) K)
+    (hValue : ∀ i, ContinuousOn (system.value i) (system.moment i '' K))
     (hResistance : LowerSemicontinuousOn resistance K)
     (hρ : 0 < ρ) :
     UpperSemicontinuousOn (system.regularizedObjective resistance ρ) K := by
   have hW : UpperSemicontinuousOn system.welfare K :=
-    (system.welfare_continuous hMoment hValue).continuousOn.upperSemicontinuousOn
+    (system.welfare_continuousOn hMoment hValue).upperSemicontinuousOn
   have hScaleContinuous : Continuous (fun t : ℝ ↦ ρ * t) :=
     continuous_const.mul continuous_id
   have hScaleMonotone : Monotone (fun t : ℝ ↦ ρ * t) := by
@@ -125,9 +127,9 @@ theorem existsUnique_regularized_solution_of_lowerSemicontinuous
     [TopologicalSpace E]
     (system : DemandSystem I E) {K : Set E} {resistance : E → ℝ} {ρ : ℝ}
     (hKne : K.Nonempty) (hKcompact : IsCompact K)
-    (hMomentCont : ∀ i, Continuous (system.moment i))
-    (hValueCont : ∀ i, Continuous (system.value i))
-    (hValueConcave : ∀ i, ConcaveOn ℝ Set.univ (system.value i))
+    (hMomentCont : ∀ i, ContinuousOn (system.moment i) K)
+    (hValueCont : ∀ i, ContinuousOn (system.value i) (system.moment i '' K))
+    (hValueConcave : ∀ i, ConcaveOn ℝ (system.moment i '' K) (system.value i))
     (hResistanceLsc : LowerSemicontinuousOn resistance K)
     (hResistanceStrict : StrictConvexOn ℝ K resistance)
     (hρ : 0 < ρ) :
@@ -145,17 +147,17 @@ continuous. -/
 theorem existsUnique_regularized_solution_of_continuous [TopologicalSpace E]
     (system : DemandSystem I E) {K : Set E} {resistance : E → ℝ} {ρ : ℝ}
     (hKne : K.Nonempty) (hKcompact : IsCompact K)
-    (hMomentCont : ∀ i, Continuous (system.moment i))
-    (hValueCont : ∀ i, Continuous (system.value i))
-    (hValueConcave : ∀ i, ConcaveOn ℝ Set.univ (system.value i))
-    (hResistanceCont : Continuous resistance)
+    (hMomentCont : ∀ i, ContinuousOn (system.moment i) K)
+    (hValueCont : ∀ i, ContinuousOn (system.value i) (system.moment i '' K))
+    (hValueConcave : ∀ i, ConcaveOn ℝ (system.moment i '' K) (system.value i))
+    (hResistanceCont : ContinuousOn resistance K)
     (hResistanceStrict : StrictConvexOn ℝ K resistance)
     (hρ : 0 < ρ) :
     ∃! x : E,
       x ∈ K ∧ IsMaxOn (system.regularizedObjective resistance ρ) K x := by
   exact system.existsUnique_regularized_solution_of_lowerSemicontinuous
     hKne hKcompact hMomentCont hValueCont hValueConcave
-    hResistanceCont.continuousOn.lowerSemicontinuousOn hResistanceStrict hρ
+    hResistanceCont.lowerSemicontinuousOn hResistanceStrict hρ
 
 end DemandSystem
 

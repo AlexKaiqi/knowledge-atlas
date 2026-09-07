@@ -1,5 +1,9 @@
 # 三座位静态配置：两份文档的校正与 Lean 4 验证
 
+本文是采用 Gibbs 配置规则后的有限特例。基本研究问题与未预设熵形式的定义见
+[代币、需求度量与权益配置](TOKEN_ALLOCATION_PROBLEM.md)；这里的闭式证明不构成从支付一致性
+唯一推导 Gibbs 机制的证明。
+
 ## 结论先行
 
 本轮只处理两份文档共同的“问题一”：需求已经给定时，如何在三个座位的六种完整配置之间形成一个概率分布。动态注意力市场、Matcher 学习与路由暂不进入本轮形式化。
@@ -33,7 +37,7 @@
 因此
 
 \[
-D_C=\Omega\setminus D_{AB},\qquad |D_{AB}|=4,qquad |D_C|=2,
+D_C=\Omega\setminus D_{AB},\qquad |D_{AB}|=4,\qquad |D_C|=2,
 \]
 
 以及
@@ -93,7 +97,7 @@ P_\gamma(D_{AB})
 则最优分布是 \(P_0(\cdot\mid D)\)，成本为 \(-\ln p\)。代入座位计数得到
 
 \[
-u_{AB}=\ln\frac32,qquad u_C=\ln3.
+u_{AB}=\ln\frac32,\qquad u_C=\ln3.
 \]
 
 若以 bit 计量，则分别为 \(\log_2(3/2)\approx0.585\) 与 \(\log_2 3\approx1.585\)。

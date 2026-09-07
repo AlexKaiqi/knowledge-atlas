@@ -3,11 +3,18 @@
 This directory is an isolated Lean 4 + Mathlib project for machine-checking
 mathematical arguments.
 
+Start with [the static token-allocation problem](TOKEN_ALLOCATION_PROBLEM.md)
+for the primitives, payment equivalences, unknown demand measure and allocation
+mechanism. It separates the research problem from additional entropy and update
+axioms. The KL model below is one conditional model, not a derivation of those
+axioms from token aggregation.
+
 Useful checks:
 
 ```sh
 lake build
 lake env lean Smoke.lean
+lake env lean AlignmentChecks.lean
 ```
 
 Proofs intended as final results should compile without `sorry`. Use
@@ -16,16 +23,22 @@ review their axiom dependencies.
 
 Current case studies:
 
-- `Formal/DemandSystem.lean`: finite families of general linear-moment demands,
-  concave welfare, positive KL scaling, and existence/uniqueness.
-- `Formal/EntropyUniqueness.lean`: strict convexity of density entropy and
-  almost-everywhere uniqueness of the optimal density on arbitrary measurable spaces.
+- `Formal/DemandSystem.lean`: finite families of linear-moment demands with value
+  regularity restricted to attainable moment images, and abstract compact existence/uniqueness.
+- `Formal/EntropyUniqueness.lean`: extended KL entropy, an objective that assigns
+  negative infinity to infinite entropy, and almost-everywhere uniqueness of optimal densities.
+- `Formal/DensityDemandSystem.lean`: actual integral moments of bounded statistics
+  on probability densities, and uniqueness with one finite-entropy feasible witness.
+- `AlignmentChecks.lean`: square-root utility on a bounded interval, the
+  infinite-entropy objective boundary, and axiom checks for the concrete static model.
 - `Formal/FunctionalCalibration.lean`: continuous Cauchy equations for logarithmic
   information and exponential impact, including the extra calibrations that fix their scales.
 - `Formal/PossibilityAllocation.lean`: general measurable-space Gibbs uniqueness
   and the abstract compact/strict-concavity theorem.
-- `POSSIBILITY_ALLOCATION.md`: the general static demand--possibility model,
-  well-posedness assumptions, proof, KKT layer, and exact Lean coverage.
+- `TOKEN_ALLOCATION_PROBLEM.md`: the static research problem, given token inputs,
+  demand measurement, executable entitlements, and boundaries of additional axioms.
+- `POSSIBILITY_ALLOCATION.md`: a conditional KL-regularized demand--possibility
+  model, well-posedness assumptions, proof, KKT layer, and exact Lean coverage.
 - `Formal/DynamicAttention.lean`: finite-horizon Bellman existence and uniqueness,
   plus the exact Gibbs policy at every unconstrained KL-control step.
 - `Formal/MatcherRouting.lean`: unique finite Matcher routing, Softmax shares,

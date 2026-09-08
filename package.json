@@ -1,6 +1,6 @@
 {
   "name": "knowledge-atlas",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,8 @@
     "test": "node --test tests/*.test.mjs",
     "validate:learning": "node scripts/validate-learning.mjs",
     "db:generate": "drizzle-kit generate",
-    "apply:revision": "node scripts/apply-revision.mjs"
+    "apply:revision": "node scripts/apply-revision.mjs",
+    "export:knowledge": "node scripts/export-knowledge.mjs"
   },
   "dependencies": {
     "d3-drag": "3.0.0",

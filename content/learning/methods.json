@@ -1,40 +1,251 @@
 {
-  "version":1,
-  "reviewedAt":"2026-09-08",
-  "principles":[
-    {"id":"prediction","title":"先留下自己的想法","icon":"compass","description":"面对具体问题，先预测、选择或写下理由。把初始判断和之后的解释放在一起，观察自己的想法如何改变。","boundary":"预测不是门禁。暂时没有想法时，可以查看示范或直接阅读。","sources":["code-org"]},
-    {"id":"scaffolding","title":"探索需要及时的帮助","icon":"route","description":"从情境与例子建立直觉，按需展开机制与正式概念。卡住时可以获得提示、示范或直接解释，熟悉后可以跳读。","boundary":"有引导的探究不等于放任摸索，也不等于拒绝直接讲解。","sources":["hmelo-silver","phet","refactoring-guru"]},
-    {"id":"self-explanation","title":"把理解变成自己的解释","icon":"chat","description":"解释新知识与已有经验的关系，说明为什么，而不是复述句子。用参考要点帮助自查，不按字数自动判断理解。","boundary":"自我解释的价值取决于内容与提示质量，不能要求每一段都写长答。","sources":["chi","dunlosky"]},
-    {"id":"retrieval","title":"过一段时间，再试着想起来","icon":"notebook","description":"学完后先不看解释，尝试回答；之后核对反馈，并在未来重访。复习时间可以自己调整。","boundary":"没有适合所有人的固定最优间隔。“看过”与“掌握”是不同记录。","sources":["dunlosky"]},
-    {"id":"transfer","title":"在新的情境里检验理解","icon":"flask","description":"改变背景、条件或目标，再应用同一原理。实践先声明假设、可变条件和观察目标，结果可以保存并带入讨论。","boundary":"点击和完成游戏不等于掌握。模拟结果只说明给定模型下发生了什么。","sources":["phet","explorable","experience-ai"]},
-    {"id":"co-construction","title":"让异议成为知识改进的入口","icon":"edit","description":"保留自由讨论、实践记录和知识正文的不同状态。贡献附上来源与理由，通过版本差异、审阅和历史沉淀进百科。","boundary":"个人观察和未解决争议可以公开探讨，但不会自动变成公认事实。","sources":["wikipedia"]},
-    {"id":"ai-grounding","title":"让 AI 帮助思考，并给出依据","icon":"spark","description":"AI 协作材料携带当前问题、原文依据、误解与参考反馈。可以请 AI 追问、给例子或反例；重要判断仍需要查证。","boundary":"本版提供可复制的 AI 协作材料与人工编写的引导卡，未连接在线模型，不把固定提示伪装成 AI 对话。","sources":["ai-rct","deeptutor"]}
+  "version": 2,
+  "reviewedAt": "2026-09-08",
+  "principles": [
+    {
+      "id": "prediction",
+      "title": "先留下自己的想法",
+      "icon": "compass",
+      "description": "面对具体问题，先预测、选择或写下理由。把初始判断和之后的解释放在一起，观察自己的想法如何改变。",
+      "boundary": "预测不是门禁。暂时没有想法时，可以查看示范或直接阅读。",
+      "sources": [
+        "code-org"
+      ]
+    },
+    {
+      "id": "scaffolding",
+      "title": "探索需要及时的帮助",
+      "icon": "route",
+      "description": "从情境与例子建立直觉，按需展开机制与正式概念。卡住时可以获得提示、示范或直接解释，熟悉后可以跳读。",
+      "boundary": "有引导的探究不等于放任摸索，也不等于拒绝直接讲解。",
+      "sources": [
+        "hmelo-silver",
+        "phet",
+        "refactoring-guru"
+      ]
+    },
+    {
+      "id": "self-explanation",
+      "title": "把理解变成自己的解释",
+      "icon": "chat",
+      "description": "解释新知识与已有经验的关系，说明为什么，而不是复述句子。用参考要点帮助自查，不按字数自动判断理解。",
+      "boundary": "自我解释的价值取决于内容与提示质量，不能要求每一段都写长答。",
+      "sources": [
+        "chi",
+        "dunlosky"
+      ]
+    },
+    {
+      "id": "retrieval",
+      "title": "过一段时间，再试着想起来",
+      "icon": "notebook",
+      "description": "学完后先不看解释，尝试回答；之后核对反馈，并在未来重访。复习时间可以自己调整。",
+      "boundary": "没有适合所有人的固定最优间隔。“看过”与“掌握”是不同记录。",
+      "sources": [
+        "dunlosky"
+      ]
+    },
+    {
+      "id": "transfer",
+      "title": "在新的情境里检验理解",
+      "icon": "flask",
+      "description": "改变背景、条件或目标，再应用同一原理。实践先声明假设、可变条件和观察目标，结果可以保存并带入讨论。",
+      "boundary": "点击和完成游戏不等于掌握。模拟结果只说明给定模型下发生了什么。",
+      "sources": [
+        "phet",
+        "explorable",
+        "experience-ai"
+      ]
+    },
+    {
+      "id": "co-construction",
+      "title": "让异议成为知识改进的入口",
+      "icon": "edit",
+      "description": "保留自由讨论、实践记录和知识正文的不同状态。贡献附上来源与理由，通过版本差异、审阅和历史沉淀进百科。",
+      "boundary": "个人观察和未解决争议可以公开探讨，但不会自动变成公认事实。",
+      "sources": [
+        "wikipedia"
+      ]
+    },
+    {
+      "id": "ai-grounding",
+      "title": "让 AI 帮助思考，并给出依据",
+      "icon": "spark",
+      "description": "AI 协作材料携带当前问题、原文依据、误解与参考反馈。可以请 AI 追问、给例子或反例；重要判断仍需要查证。",
+      "boundary": "Agent 依据真实来源和执行结果帮助探索，不伪造已经核验或掌握。当前在线模型尚未接入；任务会明确等待配置。",
+      "sources": [
+        "ai-rct",
+        "deeptutor"
+      ]
+    }
   ],
-  "sources":[
-    {"id":"dunlosky","title":"Dunlosky 等 · 有效学习技术综述（2013）","url":"https://doi.org/10.1177/1529100612453266","type":"研究综述","finding":"综述将检索练习与间隔练习评为高适用性，自我解释等为中等；可优先考虑前两者。","limit":"不是新做的总体元分析；评价不保证每种内容与实现同样有效。"},
-    {"id":"hmelo-silver","title":"Hmelo-Silver 等 · 有支架的问题与探究学习（2007）","url":"https://doi.org/10.1080/00461520701263368","type":"论证性综述","finding":"问题与探究学习可以包含丰富支架、任务拆解和直接解释。","limit":"不是新的因果实验；不能解释为所有无指导发现都有益。"},
-    {"id":"chi","title":"Chi 等 · 诱发自我解释促进理解（1994）","url":"https://doi.org/10.1207/s15516709cog1803_3","type":"小样本干预研究","finding":"24 名八年级学生的循环系统学习中，自我解释提示组的前后测增益较高。","limit":"单一学科、小样本，不能外推为所有用户的长期与远迁移收益。"},
-    {"id":"ai-rct","title":"Kestin 等 · AI 辅导随机交叉试验（2025）","url":"https://www.nature.com/articles/s41598-025-97652-6","type":"随机交叉试验","finding":"194 名大学物理学生、两个课题中，专家设计的 AI 辅导方案课后测表现较高。","limit":"比较包含节奏、界面与教学设计的整体方案；不等于所有聊天 AI 更有效，也未建立长期保持效果。"},
-    {"id":"code-org","title":"Code.org · CS Discoveries 课程指南","url":"https://code.org/files/CSDiscoveries-Curriculum-Guide.pdf","type":"官方课程设计","finding":"定义、准备、尝试、反思；预测后运行；个人思考后交流。","limit":"历史指南、主要面向课堂；不能宣称当前所有课程一致或直接推断成人独学效果。"},
-    {"id":"phet","title":"PhET · 研究与仿真设计","url":"https://phet.colorado.edu/en/research","type":"研究与设计流程","finding":"围绕概念目标和常见困难设计仿真，重视预测、改变变量、证据与学习者反馈。","limit":"仿真不能覆盖全部实体设备技能，本项目的仿真仍需自己的试学证据。"},
-    {"id":"experience-ai","title":"Experience AI · AI Safety 11–14","url":"https://experience-ai.org/en/units/ai-safety-11-14","type":"官方课程设计","finding":"以目标、词汇、情境讨论和离线挑战组织数据与信息判断学习。","limit":"本次只查阅公开课页，未访问需要登录下载的教案；目标群体为 11–14 岁。"},
-    {"id":"refactoring-guru","title":"Refactoring.Guru · Strategy","url":"https://refactoring.guru/design-patterns/strategy","type":"知识呈现设计","finding":"问题、方案、类比、结构、例子、适用性与优缺点分层呈现。","limit":"模式是有取舍的方案；不能把名称教学当作应用能力。"},
-    {"id":"explorable","title":"Bret Victor · Explorable Explanations","url":"https://worrydream.com/ExplorableExplanations/","type":"作者设计论述","finding":"让读者检查假设、操纵模型并比较后果；解释与操作紧密相连。","limit":"不是学习效果实验；给页面配动画并不自动实现这种目标。"},
-    {"id":"deeptutor","title":"DeepTutor · 项目与方法","url":"https://github.com/HKUDS/DeepTutor","type":"产品与技术实现","finding":"目标与来源绑定；按知识类型组织学习证据；公共资料与个人学习状态分离。","limit":"功能说明不能证明真实学习收益；其技术报告主要使用模拟学习者，不能据此宣称学生效率提升。"},
-    {"id":"wikipedia","title":"Wikipedia · 历史与可验证性","url":"https://en.wikipedia.org/wiki/Wikipedia:Verifiability","type":"社区内容治理","finding":"主张需有可检查来源，保留编辑说明、版本历史与条目关联讨论。","limit":"Wikipedia 讨论页并非自由论坛；本项目另设自由探讨空间，保留原创实践与未证实想法。"},
-    {"id":"coolmath","title":"Coolmath Games · 游戏审核指南","url":"https://www.coolmathgames.com/game-review-guidelines","type":"官方选品标准","finding":"活动包含策略、记忆、数感或解谜思考，发布前人工试玩。","limit":"不是所有游戏都教数学；选品标准不证明知识迁移，其聊天限制也不适合照搬。"},
-    {"id":"loopy","title":"Nicky Case · LOOPY","url":"https://ncase.me/loopy/","type":"可探索建模工具","finding":"改变系统、观察结果；通过修改模型展开讨论。","limit":"设计与功能观察，不构成独立学习效果证据。"}
+  "sources": [
+    {
+      "id": "dunlosky",
+      "title": "Dunlosky 等 · 有效学习技术综述（2013）",
+      "url": "https://doi.org/10.1177/1529100612453266",
+      "type": "研究综述",
+      "finding": "综述将检索练习与间隔练习评为高适用性，自我解释等为中等；可优先考虑前两者。",
+      "limit": "不是新做的总体元分析；评价不保证每种内容与实现同样有效。"
+    },
+    {
+      "id": "hmelo-silver",
+      "title": "Hmelo-Silver 等 · 有支架的问题与探究学习（2007）",
+      "url": "https://doi.org/10.1080/00461520701263368",
+      "type": "论证性综述",
+      "finding": "问题与探究学习可以包含丰富支架、任务拆解和直接解释。",
+      "limit": "不是新的因果实验；不能解释为所有无指导发现都有益。"
+    },
+    {
+      "id": "chi",
+      "title": "Chi 等 · 诱发自我解释促进理解（1994）",
+      "url": "https://doi.org/10.1207/s15516709cog1803_3",
+      "type": "小样本干预研究",
+      "finding": "24 名八年级学生的循环系统学习中，自我解释提示组的前后测增益较高。",
+      "limit": "单一学科、小样本，不能外推为所有用户的长期与远迁移收益。"
+    },
+    {
+      "id": "ai-rct",
+      "title": "Kestin 等 · AI 辅导随机交叉试验（2025）",
+      "url": "https://www.nature.com/articles/s41598-025-97652-6",
+      "type": "随机交叉试验",
+      "finding": "194 名大学物理学生、两个课题中，专家设计的 AI 辅导方案课后测表现较高。",
+      "limit": "比较包含节奏、界面与教学设计的整体方案；不等于所有聊天 AI 更有效，也未建立长期保持效果。"
+    },
+    {
+      "id": "code-org",
+      "title": "Code.org · CS Discoveries 课程指南",
+      "url": "https://code.org/files/CSDiscoveries-Curriculum-Guide.pdf",
+      "type": "官方课程设计",
+      "finding": "定义、准备、尝试、反思；预测后运行；个人思考后交流。",
+      "limit": "历史指南、主要面向课堂；不能宣称当前所有课程一致或直接推断成人独学效果。"
+    },
+    {
+      "id": "phet",
+      "title": "PhET · 研究与仿真设计",
+      "url": "https://phet.colorado.edu/en/research",
+      "type": "研究与设计流程",
+      "finding": "围绕概念目标和常见困难设计仿真，重视预测、改变变量、证据与学习者反馈。",
+      "limit": "仿真不能覆盖全部实体设备技能，本项目的仿真仍需自己的试学证据。"
+    },
+    {
+      "id": "experience-ai",
+      "title": "Experience AI · AI Safety 11–14",
+      "url": "https://experience-ai.org/en/units/ai-safety-11-14",
+      "type": "官方课程设计",
+      "finding": "以目标、词汇、情境讨论和离线挑战组织数据与信息判断学习。",
+      "limit": "本次只查阅公开课页，未访问需要登录下载的教案；目标群体为 11–14 岁。"
+    },
+    {
+      "id": "refactoring-guru",
+      "title": "Refactoring.Guru · Strategy",
+      "url": "https://refactoring.guru/design-patterns/strategy",
+      "type": "知识呈现设计",
+      "finding": "问题、方案、类比、结构、例子、适用性与优缺点分层呈现。",
+      "limit": "模式是有取舍的方案；不能把名称教学当作应用能力。"
+    },
+    {
+      "id": "explorable",
+      "title": "Bret Victor · Explorable Explanations",
+      "url": "https://worrydream.com/ExplorableExplanations/",
+      "type": "作者设计论述",
+      "finding": "让读者检查假设、操纵模型并比较后果；解释与操作紧密相连。",
+      "limit": "不是学习效果实验；给页面配动画并不自动实现这种目标。"
+    },
+    {
+      "id": "deeptutor",
+      "title": "DeepTutor · 项目与方法",
+      "url": "https://github.com/HKUDS/DeepTutor",
+      "type": "产品与技术实现",
+      "finding": "目标与来源绑定；按知识类型组织学习证据；公共资料与个人学习状态分离。",
+      "limit": "功能说明不能证明真实学习收益；其技术报告主要使用模拟学习者，不能据此宣称学生效率提升。"
+    },
+    {
+      "id": "wikipedia",
+      "title": "Wikipedia · 历史与可验证性",
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Verifiability",
+      "type": "社区内容治理",
+      "finding": "主张需有可检查来源，保留编辑说明、版本历史与条目关联讨论。",
+      "limit": "Wikipedia 讨论页并非自由论坛；本项目另设自由探讨空间，保留原创实践与未证实想法。"
+    },
+    {
+      "id": "coolmath",
+      "title": "Coolmath Games · 游戏审核指南",
+      "url": "https://www.coolmathgames.com/game-review-guidelines",
+      "type": "官方选品标准",
+      "finding": "活动包含策略、记忆、数感或解谜思考，发布前人工试玩。",
+      "limit": "不是所有游戏都教数学；选品标准不证明知识迁移，其聊天限制也不适合照搬。"
+    },
+    {
+      "id": "loopy",
+      "title": "Nicky Case · LOOPY",
+      "url": "https://ncase.me/loopy/",
+      "type": "可探索建模工具",
+      "finding": "改变系统、观察结果；通过修改模型展开讨论。",
+      "limit": "设计与功能观察，不构成独立学习效果证据。"
+    }
   ],
-  "checklist":[
-    {"id":"question","title":"有真实的入口问题与目标读者","automatic":"情境、读者、先修引用存在","human":"问题是否自然引出知识？初学者是否有补齐背景的入口？"},
-    {"id":"goal","title":"目标能通过表现观察","automatic":"至少一个学习目标与关联知识","human":"学后能解释、比较或完成什么？不能只写“了解”。"},
-    {"id":"prediction","title":"允许先表达判断并获得提示","automatic":"预测题、有效答案索引、逐项反馈与提示","human":"预测是否触及关键误解？不会时能否获得帮助而继续？"},
-    {"id":"layers","title":"解释由直觉进入机制与边界","automatic":"至少三层解释，各有例子与边界","human":"术语是否及时解释？类比哪里成立、哪里失效？"},
-    {"id":"activity","title":"活动服务于理解，模型可检查","automatic":"操作条件、观察目标、类型与模型边界","human":"读者是否真的进行推理？模拟与真实观测是否区分？"},
-    {"id":"feedback","title":"反馈解释原因并指出下一步","automatic":"每个选择都有反馈；目标和知识引用可解析","human":"干扰项与参考答案是否正确？开放题不以字数或关键词宣称掌握。"},
-    {"id":"transfer","title":"有换情境任务、自我解释与重访","automatic":"迁移题、反思与复习提示存在","human":"是否真的改变了情境或条件，而不只是换数字？"},
-    {"id":"evidence","title":"主张、来源与认知状态一致","automatic":"知识的来源、假设、边界和版本存在","human":"来源是否支持具体主张？事实、模型、经验与意见是否区分？"},
-    {"id":"contribution","title":"可以追问、修订和查看变更","automatic":"关联目标、基础版本、理由与来源字段","human":"异议是否被保留？待验证的讨论是否被误写成定论？"},
-    {"id":"trial","title":"明确标出实际验证程度","automatic":"审阅状态属于允许集合","human":"是否请目标读者独立走通？未做试学，不得声称学习效果已验证。"}
-  ]
+  "checklist": [
+    {
+      "id": "question",
+      "title": "有真实的入口问题与目标读者",
+      "automatic": "只检查已提供的知识和先修引用，不强制入口题或目标读者字段",
+      "human": "问题是否自然引出知识？初学者是否有补齐背景的入口？"
+    },
+    {
+      "id": "goal",
+      "title": "目标能通过表现观察",
+      "automatic": "目标可用自然语言说明；程序不按固定措辞判断学习能力",
+      "human": "学后能解释、比较或完成什么？不能只写“了解”。"
+    },
+    {
+      "id": "prediction",
+      "title": "允许先表达判断并获得提示",
+      "automatic": "仅当提供选择题时检查答案索引和对应反馈，不强制预测题",
+      "human": "预测是否触及关键误解？不会时能否获得帮助而继续？"
+    },
+    {
+      "id": "layers",
+      "title": "解释能让目标读者理解，层次按需展开",
+      "automatic": "章节、层数、例子数量均自由；正文按内容责任审阅",
+      "human": "术语是否及时解释？类比哪里成立、哪里失效？"
+    },
+    {
+      "id": "activity",
+      "title": "活动服务于理解，模型可检查",
+      "automatic": "真实执行检查运行协议、输入和版本；无须每篇配实验",
+      "human": "读者是否真的进行推理？模拟与真实观测是否区分？"
+    },
+    {
+      "id": "feedback",
+      "title": "反馈解释原因并指出下一步",
+      "automatic": "仅对已提供的互动校验可用反馈，不强制选择题格式",
+      "human": "干扰项与参考答案是否正确？开放题不以字数或关键词宣称掌握。"
+    },
+    {
+      "id": "transfer",
+      "title": "按需要检验应用、自我解释与重访",
+      "automatic": "适用时选择迁移、自我解释或重访，不要求全部配置",
+      "human": "是否真的改变了情境或条件，而不只是换数字？"
+    },
+    {
+      "id": "evidence",
+      "title": "主张、来源与认知状态一致",
+      "automatic": "检查版本和已提供的来源地址；缺少依据须明确为待核验",
+      "human": "来源是否支持具体主张？事实、模型、经验与意见是否区分？"
+    },
+    {
+      "id": "contribution",
+      "title": "可以追问、修订和查看变更",
+      "automatic": "检查基础版本、访问权限和可解析关系，不限定五个正文栏位",
+      "human": "异议是否被保留？待验证的讨论是否被误写成定论？"
+    },
+    {
+      "id": "trial",
+      "title": "明确标出实际验证程度",
+      "automatic": "结构检查、Agent 审阅、人审与真人试学分别记录，不能冒用",
+      "human": "是否请目标读者独立走通？未做试学，不得声称学习效果已验证。"
+    }
+  ],
+  "reviewPolicy": "先判断适用性，再记录满足/需改进/不适用及理由。方法不是统一的页面模板。审阅可以由 Agent 或人执行，必须标明实际执行者；真人试学另记。"
 }

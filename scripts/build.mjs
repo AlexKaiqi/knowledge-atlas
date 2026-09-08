@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { build as bundle } from "esbuild";
 import { root, readJson, write, copyDir } from "./lib.mjs";
-import { renderHome } from "../site/pages/home.mjs";
+import { renderWorkspace } from "../site/pages/workspace.mjs";
 import { renderCase } from "../site/pages/case.mjs";
 import { renderExplore } from "../site/pages/explore.mjs";
 import {
@@ -90,7 +90,17 @@ const methods = await readJson("content/learning/methods.json");
 const knowledge = [];
 const knowledgeById = new Map();
 for (const id of knowledgeIds) {
-  const k = await readJson(`content/knowledge/${id}.json`);
+  const raw = await readJson(`content/knowledge/${id}.json`);
+  const k = {
+    assumptions: [],
+    doesNotImply: [],
+    engineeringImplications: [],
+    sources: [],
+    statement: raw.body || raw.summary,
+    titleZh: raw.title,
+    epistemicType: "待进一步理解",
+    ...raw,
+  };
   knowledge.push(k);
   knowledgeById.set(id, k);
 }
@@ -99,7 +109,7 @@ for (const id of caseIds) {
   cases.push(await readJson(`content/cases/${id}/case.json`));
 }
 
-await write("dist/index.html", renderHome({ questions, knowledgeById }));
+await write("dist/index.html", renderWorkspace({ knowledge }));
 await write("dist/paths/index.html", renderPaths({ questions, knowledge }));
 for (const question of questions)
   await write(
@@ -116,7 +126,7 @@ for (const kind of ["parallel", "causal"])
   await write(`dist/practice/${kind}/index.html`, renderExperiment({ kind }));
 await write("dist/contribute/index.html", renderContribute({ methods }));
 await write(
-  "dist/explore/index.html",
+  "dist/map/index.html",
   renderExplore({ cases, planned, knowledge, questions }),
 );
 await write(
@@ -219,6 +229,10 @@ for (const k of knowledge)
 
 await write("dist/llms-full.txt", llmsFull({ cases, planned, knowledge }));
 
+await write(
+  "dist/explore/index.html",
+  renderWorkspace({ root: "../", knowledge }),
+);
 await write("dist/method/index.html", renderMethods({ methods }));
 await write(
   "dist/data/learning.json",
@@ -292,6 +306,7 @@ for (const name of [
   "contribute",
   "method",
   "explore",
+  "map",
   "cases",
   "data",
   "llms.txt",

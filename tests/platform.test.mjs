@@ -227,3 +227,21 @@ test("public contributions persist; private notes are isolated; experiment snaps
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("free knowledge and questions do not require a fixed lesson template", () => {
+  const flexible = structuredClone(content);
+  flexible.questions = [
+    { id: "an-open-question", title: "尚在探索中的开放问题", version: 1 },
+  ];
+  flexible.guides = {};
+  flexible.knowledge = [
+    {
+      id: "original-observation",
+      version: 1,
+      title: "一次观察",
+      status: "draft",
+      body: "自由组织的观察与未知。",
+    },
+  ];
+  assert.deepEqual(validateLearning(flexible), []);
+});

@@ -4,6 +4,10 @@ import path from "node:path";
 import { root } from "./lib.mjs";
 import { createApi } from "../server/api.mjs";
 import { openLocalDatabase } from "../server/local-db.mjs";
+import {
+  dockerCapability,
+  startDockerRunner,
+} from "../server/docker-runner.mjs";
 const port = Number(process.env.PORT || 8080),
   dist = path.join(root, "dist/client");
 const db = openLocalDatabase(
@@ -13,7 +17,9 @@ const db = openLocalDatabase(
 const catalog = JSON.parse(
   await fs.readFile(path.join(root, ".generated/catalog.json"), "utf8"),
 );
-const handle = createApi({ catalog });
+const docker = dockerCapability();
+const stopRunner = startDockerRunner(db, docker);
+const handle = createApi({ catalog, docker: !!docker });
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -108,7 +114,8 @@ server.listen(port, "127.0.0.1", () =>
 );
 for (const signal of ["SIGINT", "SIGTERM"])
   process.on(signal, () =>
-    server.close(() => {
+    server.close(async () => {
+      await stopRunner();
       db.close();
       process.exit(0);
     }),

@@ -14,8 +14,13 @@ import {
   choices,
 } from "../components/learning.mjs";
 export function renderWiki({ knowledge: k, guides, questions }) {
-  const g = guides[k.id];
-  const related = questions.filter((q) => q.knowledge.includes(k.id));
+  const g = guides[k.id] || {
+    question: k.summary,
+    intuition: k.summary,
+    example: "",
+    check: "你会怎样用自己的话解释它？还有哪些地方需要查证？",
+  };
+  const related = questions.filter((q) => q.knowledge?.includes(k.id));
   return shell({
     title: `${k.titleZh} · 知图百科`,
     root: "../../",

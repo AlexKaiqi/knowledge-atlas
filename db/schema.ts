@@ -71,3 +71,162 @@ export const observations = sqliteTable(
   },
   (t) => [index("idx_observations_owner_recorded").on(t.owner, t.recordedAt)],
 );
+
+// Exploration service. Text bodies are intentionally free-form; stable identity,
+// access and immutable revisions form the protocol, not a teaching template.
+export const actors = sqliteTable("ws_actors", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  preferences: text("preferences").notNull().default("{}"),
+  createdAt: integer("created_at").notNull(),
+});
+export const explorations = sqliteTable("ws_explorations", {
+  id: text("id").primaryKey(),
+  owner: text("owner")
+    .notNull()
+    .references(() => actors.id),
+  title: text("title").notNull(),
+  visibility: text("visibility").notNull().default("private"),
+  version: integer("version").notNull().default(1),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+export const members = sqliteTable(
+  "ws_members",
+  {
+    space: text("space")
+      .notNull()
+      .references(() => explorations.id),
+    actor: text("actor")
+      .notNull()
+      .references(() => actors.id),
+    role: text("role").notNull(),
+    joinedAt: integer("joined_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.space, t.actor] })],
+);
+export const messages = sqliteTable(
+  "ws_messages",
+  {
+    id: text("id").primaryKey(),
+    space: text("space")
+      .notNull()
+      .references(() => explorations.id),
+    actor: text("actor")
+      .notNull()
+      .references(() => actors.id),
+    body: text("body").notNull(),
+    clientId: text("client_id").notNull(),
+    digest: text("digest").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => [index("idx_ws_messages_space_time").on(t.space, t.createdAt)],
+);
+export const requests = sqliteTable(
+  "ws_requests",
+  {
+    actor: text("actor").notNull(),
+    key: text("key").notNull(),
+    digest: text("digest").notNull(),
+    response: text("response").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.actor, t.key] })],
+);
+export const artifacts = sqliteTable("ws_artifacts", {
+  id: text("id").primaryKey(),
+  space: text("space")
+    .notNull()
+    .references(() => explorations.id),
+  title: text("title").notNull(),
+  kind: text("kind").notNull(),
+  version: integer("version").notNull(),
+  createdAt: integer("created_at").notNull(),
+});
+export const artifactVersions = sqliteTable(
+  "ws_artifact_versions",
+  {
+    artifact: text("artifact")
+      .notNull()
+      .references(() => artifacts.id),
+    version: integer("version").notNull(),
+    body: text("body").notNull(),
+    metadata: text("metadata").notNull(),
+    actor: text("actor")
+      .notNull()
+      .references(() => actors.id),
+    sourceMessage: text("source_message"),
+    job: text("job"),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.artifact, t.version] })],
+);
+export const jobs = sqliteTable(
+  "ws_jobs",
+  {
+    id: text("id").primaryKey(),
+    space: text("space")
+      .notNull()
+      .references(() => explorations.id),
+    actor: text("actor")
+      .notNull()
+      .references(() => actors.id),
+    runner: text("runner").notNull(),
+    input: text("input").notNull(),
+    status: text("status").notNull(),
+    attempt: integer("attempt").notNull().default(0),
+    lease: text("lease"),
+    leaseUntil: integer("lease_until"),
+    error: text("error"),
+    artifact: text("artifact"),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (t) => [index("idx_ws_jobs_status_lease").on(t.status, t.leaseUntil)],
+);
+export const documents = sqliteTable("ws_documents", {
+  id: text("id").primaryKey(),
+  owner: text("owner")
+    .notNull()
+    .references(() => actors.id),
+  title: text("title").notNull(),
+  visibility: text("visibility").notNull().default("private"),
+  status: text("status").notNull().default("draft"),
+  version: integer("version").notNull(),
+  sourceArtifact: text("source_artifact").notNull(),
+  sourceVersion: integer("source_version").notNull(),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+export const documentVersions = sqliteTable(
+  "ws_document_versions",
+  {
+    document: text("document")
+      .notNull()
+      .references(() => documents.id),
+    version: integer("version").notNull(),
+    visibility: text("visibility").notNull().default("private"),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    metadata: text("metadata").notNull(),
+    reason: text("reason").notNull(),
+    actor: text("actor")
+      .notNull()
+      .references(() => actors.id),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.document, t.version] })],
+);
+export const relations = sqliteTable(
+  "ws_relations",
+  {
+    document: text("document")
+      .notNull()
+      .references(() => documents.id),
+    version: integer("version").notNull(),
+    target: text("target").notNull(),
+    kind: text("kind").notNull(),
+    reason: text("reason").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.document, t.version, t.target, t.kind] })],
+);

@@ -26,10 +26,25 @@ export function openLocalDatabase(filename, migrations) {
       }
     }
   return {
+    async batch(statements) {
+      db.exec("BEGIN IMMEDIATE");
+      try {
+        const results = statements.map((statement) => statement.execute());
+        db.exec("COMMIT");
+        return results;
+      } catch (error) {
+        db.exec("ROLLBACK");
+        throw error;
+      }
+    },
     prepare(sql) {
       return {
         bind(...args) {
           return {
+            execute() {
+              const statement = db.prepare(sql);
+              return { results: statement.all(...args) };
+            },
             async all() {
               return { results: db.prepare(sql).all(...args) };
             },

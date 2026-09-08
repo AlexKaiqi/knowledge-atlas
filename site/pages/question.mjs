@@ -13,7 +13,19 @@ import {
   kinds,
   choices,
 } from "../components/learning.mjs";
+import { renderWorkspace } from "./workspace.mjs";
 export function renderQuestion({ question: q, knowledge }) {
+  if (
+    !q.prediction?.choices ||
+    !q.transfer?.choices ||
+    !q.activity ||
+    !q.layers
+  )
+    return renderWorkspace({
+      root: "../../",
+      knowledge: [...knowledge.values()],
+      initialQuestion: q.title,
+    });
   const activityLink =
     q.activity.kind === "agent"
       ? "../../cases/tests-green-wrong/index.html"

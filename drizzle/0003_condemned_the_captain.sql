@@ -1,0 +1,1 @@
+ALTER TABLE `ws_document_versions` ADD `visibility` text DEFAULT 'private' NOT NULL;

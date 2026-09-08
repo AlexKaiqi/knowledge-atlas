@@ -1,7 +1,7 @@
 import { shell, escapeHtml as e } from "../components/html.mjs";
 import { icon } from "../components/icons.mjs";
 export function questionCard(q, root = "./") {
-  return `<a class="question-card" href="${root}questions/${q.id}/index.html" data-search-item data-category="${e(q.category)}" data-search="${e(q.title + " " + q.category + " " + q.summary)}"><div class="card-top"><span class="topic-icon ${q.color}">${icon(q.icon)}</span><span class="meta">${e(q.category)} · ${e(q.level)}</span>${icon("arrowUp")}</div><h3>${e(q.title)}</h3><p>${e(q.summary)}</p><div class="card-foot"><span>${icon("clock")}${q.minutes} 分钟</span><span>${q.layers.length} 层理解<span class="tiny-dot"></span>动手探索</span></div></a>`;
+  return `<a class="question-card" href="${root}questions/${q.id}/index.html" data-search-item data-category="${e(q.category)}" data-search="${e(q.title + " " + q.category + " " + q.summary)}"><div class="card-top"><span class="topic-icon ${q.color}">${icon(q.icon)}</span><span class="meta">${e(q.category)} · ${e(q.level)}</span>${icon("arrowUp")}</div><h3>${e(q.title)}</h3><p>${e(q.summary)}</p><div class="card-foot"><span>${icon("clock")}${q.minutes} 分钟</span><span>${q.layers?.length || "自由"} 层理解<span class="tiny-dot"></span>动手探索</span></div></a>`;
 }
 export function renderHome({ questions = [], knowledgeById }) {
   return shell({

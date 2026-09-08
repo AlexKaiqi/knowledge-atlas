@@ -15,5 +15,5 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `Learning contract OK: ${content.questions.length} guided questions, ${content.knowledge.length} source-backed wiki guides, ${content.methods.checklist.length} review criteria. Human review and learner trials remain separate.`,
+  `Learning contract OK: ${content.questions.length} guided questions, ${content.knowledge.length} source-backed wiki guides, ${content.methods.checklist.length} review criteria. Protocol checks, content review and learner trials remain separate.`,
 );

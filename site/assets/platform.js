@@ -704,7 +704,7 @@ if ($("[data-author-checklist]")) {
   $("[data-download-template]").addEventListener("click", () =>
     download(
       "新知识引入模板.md",
-      `# 新知识引入\n\n## 入口问题与目标读者\n\n## 学完后能做什么\n\n## 先修与补齐入口\n\n## 初始预测、选项与逐项反馈\n\n## 三层解释\n### 直觉与例子\n### 机制与推导\n### 适用边界与反例\n\n## 实践\n类型（真实执行 / 教学模型 / 思想练习）：\n可变条件：\n观察目标：\n模型与来源：\n限制：\n\n## 换情境练习与反馈\n\n## 自我解释与重访任务\n\n## 主张与对应来源\n\n## 尚未解决的争议\n\n## 发布前检查\n${m.checklist.map((c) => `- [ ] ${c.title}\n  - 程序：${c.automatic}\n  - 人审：${c.human}`).join("\n")}\n\n当前状态：自由贡献草稿 / 结构检查通过 / 内容已审阅 / 已获得试学反馈（仅选真实完成的状态）\n`,
+      `# 知识草稿\n\n正文自由组织，以下是审阅参考，并非固定章节。\n\n考虑：回答什么？解释与依据是什么？适用范围和未知在哪里？如何继续探索？\n\n${m.checklist.map((c) => `- ${c.title}\n  - 适用性及理由：\n  - 满足 / 需改进 / 不适用：\n  - 参考：${c.human}`).join("\n")}\n\n审阅者（Agent / 人）：\n方法规则版本：${m.version}\n真实试学（未做则明确未做）：\n`,
       "text/markdown",
     ),
   );
@@ -729,14 +729,39 @@ $("[data-save-agent]")?.addEventListener("click", (ev) =>
   }),
 );
 
-if ($('[data-agent-notebook]') && params.has('observation')) {
-  api('notes').then(({notes}) => {
-    const saved = notes.find(n => n.id === params.get('observation') && n.target === 'practice:agent');
-    if (!saved) return;
-    for (const input of $$('[data-harness-id]')) {
-      input.checked = Boolean(saved.data.result.harness[input.dataset.harnessId]);
-      input.dispatchEvent(new Event('change', {bubbles:true}));
-    }
-    toast('已恢复保存时的验收条件。请重新运行，比较新的轨迹与结果。');
-  }).catch(err => toast(err.message));
+if ($("[data-agent-notebook]") && params.has("observation")) {
+  api("notes")
+    .then(({ notes }) => {
+      const saved = notes.find(
+        (n) =>
+          n.id === params.get("observation") && n.target === "practice:agent",
+      );
+      if (!saved) return;
+      for (const input of $$("[data-harness-id]")) {
+        input.checked = Boolean(
+          saved.data.result.harness[input.dataset.harnessId],
+        );
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      toast("已恢复保存时的验收条件。请重新运行，比较新的轨迹与结果。");
+    })
+    .catch((err) => toast(err.message));
+}
+
+if ($("[data-service-knowledge]")) {
+  api("workspace/knowledge")
+    .then(({ documents }) => {
+      $("[data-service-knowledge]").innerHTML = documents.length
+        ? documents
+            .map(
+              (d) =>
+                `<a class="wiki-row" data-search-item data-search="${esc(d.title)}" href="../index.html?doc=${d.id}"><div><span class="tag">${d.status === "draft" ? "草稿 · 可讨论" : d.status === "archived" ? "已归档" : "纳入维护"}</span><h2>${esc(d.title)}</h2><p>${d.visibility === "shared" ? "本站共享" : "私人"} · v${d.version}</p></div><span>→</span></a>`,
+            )
+            .join("")
+        : '<p class="muted">新的解释与发现可以从探索工作区整理为知识草稿。</p>';
+      filter();
+    })
+    .catch((error) => {
+      $("[data-service-knowledge]").textContent = error.message;
+    });
 }

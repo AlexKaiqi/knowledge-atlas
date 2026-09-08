@@ -1,3 +1,4 @@
+import { workspace, WorkspaceError } from "./workspace.mjs";
 const json = (data, status = 200, headers = {}) =>
   new Response(JSON.stringify(data), {
     status,
@@ -28,12 +29,19 @@ async function payload(req) {
   if (bytes.byteLength > 48000)
     throw new ApiError("内容太长，请缩短后重试。", 413);
   try {
-    return JSON.parse(new TextDecoder().decode(bytes));
+    const value = JSON.parse(new TextDecoder().decode(bytes));
+    if (!value || typeof value !== "object" || Array.isArray(value))
+      throw new Error("Expected object");
+    return value;
   } catch {
     throw new ApiError("无法读取提交内容。");
   }
 }
-export function createApi({ catalog }) {
+export function createApi({
+  catalog,
+  accountForRequest = () => null,
+  docker = false,
+}) {
   return async function handle(req, db) {
     const url = new URL(req.url);
     const pathname = url.pathname;
@@ -98,6 +106,15 @@ export function createApi({ catalog }) {
           .prepare(sql)
           .bind(...args)
           .run();
+      if (pathname.startsWith("/api/workspace/"))
+        return await workspace(req, db, {
+          owner,
+          reply,
+          payload,
+          catalog,
+          account: accountForRequest(req),
+          docker,
+        });
       const validTarget = (target, { knowledgeOnly = false } = {}) => {
         if (target === "general" && !knowledgeOnly) return target;
         if (
@@ -305,7 +322,7 @@ export function createApi({ catalog }) {
       }
       return reply({ error: "接口不存在。" }, 404);
     } catch (error) {
-      if (error instanceof ApiError)
+      if (error instanceof ApiError || error instanceof WorkspaceError)
         return json({ error: error.message }, error.status);
       console.error("API operation failed:", error.name);
       return json({ error: "保存服务暂时不可用，请保留输入并稍后重试。" }, 500);

@@ -5,6 +5,7 @@ dist/
 /.codex/
 /.data/
 /.generated/
+/.local/
 .env
 .env.*
 !.env.example

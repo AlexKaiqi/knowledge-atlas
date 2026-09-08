@@ -20,12 +20,14 @@
     "export:knowledge": "node scripts/export-knowledge.mjs"
   },
   "dependencies": {
+    "@agent-infra/browser-ui": "0.2.2",
     "d3-drag": "3.0.0",
     "d3-force": "3.0.0",
     "d3-selection": "3.0.0",
     "d3-zoom": "3.0.0",
     "drizzle-orm": "^0.45.2",
-    "motion": "13.2.0"
+    "motion": "13.2.0",
+    "ws": "8.21.3"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10",

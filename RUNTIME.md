@@ -1,5 +1,7 @@
 # Runtime Contract v1
 
+Scope update (2026-09-08): this is the compatibility contract for existing scripted teaching Cases, not a plan to build a platform Agent. Use [AGENT_INTEGRATION.md](AGENT_INTEGRATION.md) for the current external-Agent/Skill approach. References to a future LLM provider below describe an earlier extension idea, outside the current roadmap.
+
 A Knowledge Atlas Case is an executable experiment, not a bespoke page script.
 
 The runtime is split into three responsibilities:
@@ -18,7 +20,7 @@ Runtime Contract v1
         │
         └── Agent Provider
               ├─ scripted policy (today)
-              └─ real LLM policy (later)
+              └─ real LLM policy (historical extension idea; outside current scope)
 ```
 
 The critical boundary is: **the Agent Provider chooses actions; the Environment decides what actions are allowed and what is true.**

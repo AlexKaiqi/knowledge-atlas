@@ -1,0 +1,8 @@
+{
+  "name": "Knowledge Atlas · Python standard library",
+  "build": { "dockerfile": "../Dockerfile", "context": ".." },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "explorer",
+  "overrideCommand": true
+}

@@ -1,4 +1,6 @@
 import { runBuiltinJob } from "./jobs.mjs";
+import { environments, environmentShareGuard } from "./environments.mjs";
+import { readWorkspaceJobs, workspaceJobStream } from "./codex-progress.mjs";
 export class WorkspaceError extends Error {
   constructor(message, status = 400) {
     super(message);
@@ -23,7 +25,7 @@ const hash = async (v) =>
 export async function workspace(
   req,
   db,
-  { owner, reply, payload, catalog, account = null, docker = false },
+  { owner, reply, payload, catalog, account = null, docker = false, agent = null, workbench = null },
 ) {
   const url = new URL(req.url),
     route = url.pathname.slice("/api/workspace".length),
@@ -58,7 +60,11 @@ export async function workspace(
     actor,
   );
   const capabilities = {
-    agent: false,
+    agent: !!agent?.available,
+    agentStreaming: !!agent?.available,
+    browser: !!workbench?.available,
+    agentName: agent?.available ? "Codex" : null,
+    agentReason: agent?.reason || "此服务尚未连接 Agent；问题会保存，可交给自己的 Agent 继续。",
     docker,
     builtin: true,
     voice: "browser",
@@ -144,12 +150,32 @@ export async function workspace(
     fail("这一分钟提交较多，请稍后继续。", 429);
   const touch = (id) =>
     stmt("UPDATE ws_explorations SET updated_at=? WHERE id=?", now, id);
+  async function checkAgentCapacity() {
+    if ((await one("SELECT COUNT(*) AS count FROM ws_jobs WHERE actor=? AND runner='codex' AND status IN ('queued','running')", actor)).count >= 8)
+      fail("Codex 正在处理先前的问题，请稍等再发送。输入仍会保留。", 429);
+  }
+  async function jobIdFor(key) {
+    const digest = await hash(key);
+    return `${digest.slice(0,8)}-${digest.slice(8,12)}-${digest.slice(12,16)}-${digest.slice(16,20)}-${digest.slice(20,32)}`;
+  }
+  async function agentJob(messageId, spaceId, prompt) {
+    // Stable per source message: two participants requesting an answer race safely.
+    const id = await jobIdFor(`codex:${messageId}`);
+    return { id, statement: stmt(
+      "INSERT OR IGNORE INTO ws_jobs(id,space,actor,runner,input,status,attempt,created_at,updated_at) VALUES (?,?,?,'codex',?,'queued',0,?,?)",
+      id, spaceId, actor, JSON.stringify({ messageId, prompt }), now, now,
+    ) };
+  }
   async function docAccess(id) {
     const d = await one("SELECT * FROM ws_documents WHERE id=?", id);
     if (!d || (d.owner !== actor && d.visibility !== "shared"))
       fail("知识不存在，或你没有访问权限。", 404);
     return d;
   }
+  if (route === "/environments" || route.startsWith("/environments/"))
+    return environments(req, {
+      actor, now, one, all, stmt, idempotent, access, touch, reply, payload, fail, str, uid,
+    });
   if (route === "/session" && !post)
     return reply({
       name: me.name,
@@ -188,18 +214,25 @@ export async function workspace(
   if (route === "/spaces" && post) {
     const p = await payload(req);
     const body = str(p.body, "问题");
+    const title = p.title === undefined ? body.slice(0, 80) : str(p.title, "问题名称", 80);
+    const visibility = p.visibility === undefined ? "private" : p.visibility;
+    if (!["private", "shared"].includes(visibility))
+      fail("请选择分享范围。", 422);
+    const askAgent = capabilities.agent && p.askAgent !== false;
+    if (askAgent) await checkAgentCapacity();
     const result = await idempotent(p, async () => {
       const id = uid(),
         messageId = uid();
+      const job = askAgent ? await agentJob(messageId, id, body) : null;
       return {
-        response: { id, messageId },
+        response: { id, messageId, ...(job ? { jobId: job.id } : {}) },
         statements: [
           stmt(
             "INSERT INTO ws_explorations(id,owner,title,visibility,version,created_at,updated_at) VALUES (?,?,?,?,1,?,?)",
             id,
             actor,
-            body.slice(0, 80),
-            "private",
+            title,
+            visibility,
             now,
             now,
           ),
@@ -220,17 +253,7 @@ export async function workspace(
             await hash(body),
             now,
           ),
-          stmt(
-            "INSERT INTO ws_jobs(id,space,actor,runner,input,status,attempt,created_at,updated_at) VALUES (?,?,?,?,?,?,0,?,?)",
-            uid(),
-            id,
-            actor,
-            "agent",
-            JSON.stringify({ prompt: body }),
-            "waiting_provider",
-            now,
-            now,
-          ),
+          ...(job ? [job.statement] : []),
         ],
       };
     });
@@ -241,13 +264,28 @@ export async function workspace(
     const id = sm[1],
       action = sm[2] || "",
       space = await access(id, post && !["join"].includes(action));
+    if (action === "events" && !post)
+      return workspaceJobStream(db, { space: id, actor, signal: req.signal });
+    if (action === "browser") {
+      if (!space.role) fail("加入探索后才可以操作工作浏览器。", 403);
+      if (!workbench?.available) return reply({ available: false, reason: workbench?.reason || "此服务尚未连接浏览器环境。" });
+      if (!post) return reply(await workbench.status(id));
+      const p = await payload(req);
+      if (p.operation === "stop") {
+        const idle = async () => !(await one("SELECT COUNT(*) AS count FROM ws_jobs WHERE space=? AND runner='codex' AND status IN ('queued','running')", id)).count;
+        if (!await idle() || !await workbench.stop(id, { guard: idle }))
+          fail("Codex 正在使用或准备环境，请先停止任务。", 409);
+      } else if (p.operation === "start") await workbench.ensure(id);
+      else fail("请选择启动或暂停浏览器。", 422);
+      return reply(await workbench.status(id));
+    }
     if (!action && !post) {
       const before = Number(
         url.searchParams.get("before") || Number.MAX_SAFE_INTEGER,
       );
       if (!Number.isSafeInteger(before) || before < 0) fail("无效的消息游标。");
       const messages = await all(
-        "SELECT m.rowid AS cursor,m.id,m.body,m.created_at AS createdAt,a.name,m.actor=? AS mine FROM ws_messages m JOIN ws_actors a ON a.id=m.actor WHERE m.space=? AND m.rowid<? ORDER BY m.rowid DESC LIMIT 80",
+        "SELECT m.rowid AS cursor,m.id,m.body,m.created_at AS createdAt,a.name,m.actor=? AS mine,CASE WHEN m.actor='agent:codex' THEN 'assistant' ELSE 'human' END AS kind,json_extract(j.input,'$.messageId') AS replyTo FROM ws_messages m JOIN ws_actors a ON a.id=m.actor LEFT JOIN ws_jobs j ON j.id=m.id AND j.runner='codex' WHERE m.space=? AND m.rowid<? ORDER BY m.rowid DESC LIMIT 80",
         actor,
         id,
         before,
@@ -256,10 +294,7 @@ export async function workspace(
         "SELECT a.id,a.title,a.kind,a.version,v.body,v.metadata,v.job,v.source_message AS sourceMessage,v.created_at AS createdAt,n.name FROM ws_artifacts a JOIN ws_artifact_versions v ON v.artifact=a.id AND v.version=a.version JOIN ws_actors n ON n.id=v.actor WHERE a.space=? ORDER BY v.created_at DESC LIMIT 100",
         id,
       );
-      const jobs = await all(
-        "SELECT id,runner,status,attempt,error,artifact,created_at AS createdAt,updated_at AS updatedAt FROM ws_jobs WHERE space=? ORDER BY created_at DESC LIMIT 100",
-        id,
-      );
+      const jobs = await readWorkspaceJobs(db, id);
       const members = await all(
         "SELECT a.name,m.role FROM ws_members m JOIN ws_actors a ON a.id=m.actor WHERE m.space=? ORDER BY m.joined_at LIMIT 100",
         id,
@@ -314,12 +349,16 @@ export async function workspace(
         p.baseVersion !== space.version
       )
         fail("分享范围已更新，请重新载入。", 409);
+      if (p.visibility === "shared" && !(await one(`SELECT ${environmentShareGuard} AS allowed`, id)).allowed)
+        fail("探索包含私人环境快照；请先分享对应的环境版本，或继续保持探索私有。", 403);
       const changed = await stmt(
-        "UPDATE ws_explorations SET visibility=?,version=version+1,updated_at=? WHERE id=? AND version=? RETURNING id",
+        `UPDATE ws_explorations SET visibility=?,version=version+1,updated_at=? WHERE id=? AND version=? AND (?='private' OR ${environmentShareGuard}) RETURNING id`,
         p.visibility,
         now,
         id,
         p.baseVersion,
+        p.visibility,
+        id,
       ).all();
       if (!changed.results.length) fail("探索已更新，请重新载入。", 409);
       return reply({ saved: true });
@@ -327,11 +366,14 @@ export async function workspace(
     if (action === "messages" && post) {
       const p = await payload(req),
         body = str(p.body, "消息");
+      const askAgent = capabilities.agent && p.askAgent !== false;
+      if (askAgent) await checkAgentCapacity();
       return reply(
         await idempotent(p, async () => {
           const messageId = uid();
+          const job = askAgent ? await agentJob(messageId, id, body) : null;
           return {
-            response: { id: messageId },
+            response: { id: messageId, ...(job ? { jobId: job.id } : {}) },
             statements: [
               stmt(
                 "INSERT INTO ws_messages(id,space,actor,body,client_id,digest,created_at) VALUES (?,?,?,?,?,?,?)",
@@ -344,11 +386,25 @@ export async function workspace(
                 now,
               ),
               touch(id),
+              ...(job ? [job.statement] : []),
             ],
           };
         }),
         201,
       );
+    }
+    if (action === "assistant" && post) {
+      if (!capabilities.agent) fail(capabilities.agentReason, 503);
+      const p = await payload(req);
+      const message = await one("SELECT id,body FROM ws_messages WHERE id=? AND space=? AND actor!='agent:codex'", str(p.messageId, "问题标识", 80), id);
+      if (!message) fail("要回答的问题不在当前探索中。", 404);
+      const existing = await one("SELECT id,status FROM ws_jobs WHERE space=? AND runner='codex' AND json_extract(input,'$.messageId')=? ORDER BY created_at DESC,rowid DESC LIMIT 1", id, message.id);
+      if (existing) return reply({ jobId: existing.id, status: existing.status });
+      await checkAgentCapacity();
+      return reply(await idempotent(p, async () => {
+        const job = await agentJob(message.id, id, message.body);
+        return { response: { jobId: job.id, status: "queued" }, statements: [job.statement, touch(id)] };
+      }), 201);
     }
     if (action === "artifacts" && post) {
       const p = await payload(req),
@@ -516,16 +572,23 @@ export async function workspace(
       }
       if (job.runner === "docker" && !docker)
         fail("此服务尚未连接容器执行器。", 503);
+      if (job.runner === "codex" && !capabilities.agent)
+        fail(capabilities.agentReason, 503);
+      if (job.runner === "codex") {
+        const latest = await one("SELECT id,status FROM ws_jobs WHERE space=? AND runner='codex' AND json_extract(input,'$.messageId')=? ORDER BY created_at DESC,rowid DESC LIMIT 1", id, JSON.parse(job.input).messageId);
+        if (latest && latest.id !== job.id) return reply(latest);
+        await checkAgentCapacity();
+      }
       if (!["failed", "cancelled"].includes(job.status))
         fail("这个任务无需重试。", 409);
       const p = await payload(req);
       const result = await idempotent(p, async () => {
-        const jid = uid();
+        const jid = job.runner === "codex" ? await jobIdFor(`codex-retry:${job.id}`) : uid();
         return {
           response: { id: jid },
           statements: [
             stmt(
-              "INSERT INTO ws_jobs(id,space,actor,runner,input,status,attempt,created_at,updated_at) VALUES (?,?,?,?,?,?,0,?,?)",
+              "INSERT OR IGNORE INTO ws_jobs(id,space,actor,runner,input,status,attempt,created_at,updated_at) VALUES (?,?,?,?,?,?,0,?,?)",
               jid,
               id,
               actor,

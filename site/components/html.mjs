@@ -37,6 +37,7 @@ export function shell({
     ["paths", "route", "学习路径", "paths/index.html"],
     ["knowledge", "book", "知识百科", "knowledge/index.html"],
     ["practice", "flask", "实践实验", "practice/index.html"],
+    ["agent", "spark", "用自己的 Agent", "with-agent/index.html"],
     ["community", "chat", "探讨与共建", "community/index.html"],
   ];
   const current =

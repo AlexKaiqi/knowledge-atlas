@@ -79,10 +79,12 @@ test("explorations survive restart, enforce joining and actor identity, replay w
     );
     assert.equal((await x.call(`/spaces/${id}`, null, b)).status, 404);
     assert.equal((await x.call(`/spaces/${id}/export`, null, b)).status, 404);
-    assert.equal(
-      (await x.call(`/spaces/${id}`)).data.jobs[0].status,
-      "waiting_provider",
-    );
+    assert.deepEqual((await x.call(`/spaces/${id}`)).data.jobs, []);
+    // Explicit legacy Agent todos remain readable; a question alone starts no fake Agent job.
+    await x.call(`/spaces/${id}/jobs`, request({ runner: "agent", input: { prompt: "核对这个解释" } }));
+    const pending = (await x.call(`/spaces/${id}`)).data.jobs[0];
+    assert.equal(pending.status, "waiting_provider");
+    assert.equal(pending.prompt, "核对这个解释");
     await x.call("/profile", {
       name: "Alice",
       goals: "理解科学方法",
@@ -562,4 +564,103 @@ test("knowledge export reconstructs stable Markdown directories without overwrit
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+
+test("space creation defaults to private and rejects invalid visibility without partial records", async () => {
+  const x = setup();
+  try {
+    const { b } = await x.users();
+    const implicit = await x.call("/spaces", request({ body: "默认私人问题" }));
+    const explicit = await x.call("/spaces", request({ body: "明确私人问题", visibility: "private" }));
+    assert.equal(implicit.status, 201);
+    assert.equal(explicit.status, 201);
+    for (const id of [implicit.data.id, explicit.data.id]) {
+      assert.equal((await x.call(`/spaces/${id}`)).data.space.visibility, "private");
+      assert.equal((await x.call(`/spaces/${id}`, null, b)).status, 404);
+      assert.equal((await x.call(`/spaces/${id}/join`, {}, b)).status, 404);
+    }
+    assert.deepEqual((await x.call("/spaces?view=shared", null, b)).data.spaces, []);
+    for (const visibility of [null, "", "public", "Shared", " shared ", false, 0, [], {}]) {
+      const result = await x.call("/spaces", request({ body: "无效范围", visibility }));
+      assert.equal(result.status, 422, JSON.stringify(visibility));
+      assert.equal(result.data.error, "请选择分享范围。");
+    }
+    for (const table of ["ws_explorations", "ws_members", "ws_messages", "ws_requests"]) {
+      assert.equal((await x.db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).bind().first()).count, 2);
+    }
+  } finally {
+    x.cleanup();
+  }
+});
+
+test("shared creation is discoverable, joinable and idempotent without exposing existing private spaces", async () => {
+  const x = setup();
+  try {
+    const { b } = await x.users();
+    const privateSpace = (await x.call("/spaces", request({ body: "此前的私人问题" }))).data.id;
+    const p = request({ body: "一起讨论这个问题", visibility: "shared", askAgent: false });
+    const created = await x.call("/spaces", p);
+    assert.equal(created.status, 201);
+    const id = created.data.id;
+    assert.deepEqual((await x.call("/spaces", p)).data, created.data);
+    assert.equal((await x.call("/spaces", { ...p, visibility: "private" })).status, 409);
+    const publicList = (await x.call("/spaces?view=shared", null, b)).data.spaces;
+    assert.deepEqual(publicList.map((space) => space.id), [id]);
+    assert.equal(publicList[0].visibility, "shared");
+    assert.equal(publicList[0].version, 1);
+    assert.equal(publicList[0].role, null);
+    const beforeJoin = (await x.call(`/spaces/${id}`, null, b)).data;
+    assert.equal(beforeJoin.space.visibility, "shared");
+    assert.equal(beforeJoin.messages.length, 1);
+    assert.equal(beforeJoin.messages[0].id, created.data.messageId);
+    assert.equal(beforeJoin.messages[0].body, p.body);
+    assert.equal(beforeJoin.members.length, 1);
+    assert.equal(beforeJoin.members[0].role, "owner");
+    assert.equal((await x.call(`/spaces/${id}/messages`, request({ body: "还没加入" }), b)).status, 403);
+    assert.equal((await x.call(`/spaces/${id}/join`, {}, b)).status, 200);
+    assert.equal((await x.call(`/spaces/${id}/join`, {}, b)).status, 200);
+    assert.equal((await x.call(`/spaces/${id}`, null, b)).data.space.role, "contributor");
+    assert.equal((await x.call(`/spaces/${id}/messages`, request({ body: "加入后补充" }), b)).status, 201);
+    assert.deepEqual((await x.call("/spaces", null, b)).data.spaces.map((space) => space.id), [id]);
+    assert.equal((await x.call(`/spaces/${privateSpace}`, null, b)).status, 404);
+    assert.equal((await x.call(`/spaces/${privateSpace}`)).data.space.visibility, "private");
+    await x.call(`/spaces/${id}/share`, { baseVersion: 1, visibility: "private" });
+    assert.deepEqual((await x.call("/spaces", p)).data, created.data);
+    assert.deepEqual((await x.call("/spaces?view=shared", null, b)).data.spaces, []);
+    const loaded = (await x.call(`/spaces/${id}`)).data;
+    assert.equal(loaded.space.visibility, "private");
+    assert.equal(loaded.space.version, 2);
+    assert.equal(loaded.messages.length, 2);
+    assert.equal(loaded.members.length, 2);
+  } finally {
+    x.cleanup();
+  }
+});
+
+test("failed shared creation rolls back visibility, message, membership, Agent job and replay record together", async () => {
+  const x = setup({ agent: { available: true } });
+  try {
+    await x.users();
+    await x.db.prepare("CREATE TRIGGER reject_membership BEFORE INSERT ON ws_members BEGIN SELECT RAISE(ABORT, 'test membership failure'); END").bind().run();
+    const result = await x.call("/spaces", request({ body: "不能部分创建", visibility: "shared" }));
+    assert.equal(result.status, 500);
+    for (const table of ["ws_explorations", "ws_members", "ws_messages", "ws_jobs", "ws_requests"]) {
+      assert.equal((await x.db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).bind().first()).count, 0);
+    }
+  } finally {
+    x.cleanup();
+  }
+});
+
+test('knowledge context keeps the question as the exploration title', async () => {
+  const x = setup();
+  try {
+    await x.users();
+    const result = await x.call('/spaces', request({ title: '并行会快多少？', body: '参考知识与来源：阿姆达尔定律\n\n我的问题：并行会快多少？' }));
+    const loaded = (await x.call(`/spaces/${result.data.id}`)).data;
+    assert.equal(loaded.space.title, '并行会快多少？');
+    assert.match(loaded.messages[0].body, /参考知识与来源/);
+    assert.equal((await x.call('/spaces', request({ title: 'x'.repeat(81), body: '问题' }))).status, 400);
+  } finally { x.cleanup(); }
 });

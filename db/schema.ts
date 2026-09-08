@@ -179,6 +179,8 @@ export const jobs = sqliteTable(
     leaseUntil: integer("lease_until"),
     error: text("error"),
     artifact: text("artifact"),
+    progress: text("progress").notNull().default("{}"),
+    progressVersion: integer("progress_version").notNull().default(0),
     createdAt: integer("created_at").notNull(),
     updatedAt: integer("updated_at").notNull(),
   },
@@ -230,3 +232,35 @@ export const relations = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.document, t.version, t.target, t.kind] })],
 );
+
+// Reusable environment definitions. File contents belong to immutable versions;
+// visibility never implicitly publishes earlier private revisions.
+export const environments = sqliteTable("ws_environments", {
+  id: text("id").primaryKey(),
+  owner: text("owner").notNull().references(() => actors.id),
+  title: text("title").notNull(),
+  visibility: text("visibility").notNull().default("private"),
+  version: integer("version").notNull().default(1),
+  sourceEnvironment: text("source_environment"),
+  sourceVersion: integer("source_version"),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+}, (t) => [
+  index("idx_ws_environments_visibility_updated").on(t.visibility, t.updatedAt),
+  index("idx_ws_environments_owner_updated").on(t.owner, t.updatedAt),
+]);
+export const environmentVersions = sqliteTable("ws_environment_versions", {
+  environment: text("environment").notNull().references(() => environments.id),
+  version: integer("version").notNull(),
+  purpose: text("purpose").notNull(),
+  files: text("files").notNull(),
+  reason: text("reason").notNull(),
+  actor: text("actor").notNull().references(() => actors.id),
+  sharedAt: integer("shared_at"),
+  createdAt: integer("created_at").notNull(),
+}, (t) => [primaryKey({ columns: [t.environment, t.version] })]);
+export const environmentMembers = sqliteTable("ws_environment_members", {
+  environment: text("environment").notNull().references(() => environments.id),
+  actor: text("actor").notNull().references(() => actors.id),
+  joinedAt: integer("joined_at").notNull(),
+}, (t) => [primaryKey({ columns: [t.environment, t.actor] })]);

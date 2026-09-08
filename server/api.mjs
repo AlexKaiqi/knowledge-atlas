@@ -41,6 +41,8 @@ export function createApi({
   catalog,
   accountForRequest = () => null,
   docker = false,
+  agent = null,
+  workbench = null,
 }) {
   return async function handle(req, db) {
     const url = new URL(req.url);
@@ -114,6 +116,8 @@ export function createApi({
           catalog,
           account: accountForRequest(req),
           docker,
+          agent,
+          workbench,
         });
       const validTarget = (target, { knowledgeOnly = false } = {}) => {
         if (target === "general" && !knowledgeOnly) return target;

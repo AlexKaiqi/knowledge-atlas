@@ -25,6 +25,7 @@ export function mountCaseLab(root, adapter) {
   const manifest = readManifest(root);
   const ui = {
     run: root.querySelector('[data-lab-run]'),
+    save: root.querySelector('[data-save-agent]'),
     reset: root.querySelector('[data-lab-reset]'),
     freshness: root.querySelector('[data-run-freshness]'),
     strategy: root.querySelector('[data-lab-strategy]'),
@@ -94,6 +95,7 @@ export function mountCaseLab(root, adapter) {
   }
 
   function render() {
+    if (ui.save) ui.save.disabled = running || !hasRun || isStale() || runHistory.at(-1)?.id !== runCounter;
     const preview = currentHarness();
     const evaluated = resultHarness();
     const view = adapter.view({
@@ -166,6 +168,7 @@ export function mountCaseLab(root, adapter) {
   }
 
   function resetCurrent({ keepChat = true } = {}) {
+    if (running) return;
     state = adapter.createInitialState({ manifest });
     running = false;
     hasRun = false;
@@ -220,6 +223,7 @@ export function mountCaseLab(root, adapter) {
       truth: view.verdict?.reality?.ok === 'yes',
       confidence: view.confidence?.percent ?? null
     });
+    root.dispatchEvent(new CustomEvent('atlas:agent-run',{bubbles:true,detail:{...clone(runHistory.at(-1)),caseId:manifest.id,caseVersion:manifest.version,recordedAt:Date.now()}}));
   }
 
   async function runAgent(origin = 'button') {
@@ -230,6 +234,7 @@ export function mountCaseLab(root, adapter) {
     lastRunHarness = clone(currentHarness());
     runCounter += 1;
     if (ui.run) ui.run.disabled = true;
+    if (ui.reset) ui.reset.disabled = true;
     if (ui.terminal) ui.terminal.innerHTML = '';
     if (origin !== 'chat' && origin !== 'replay') addChat('user', '请你自己解决这个任务，直到你认为可以交付。');
     render();
@@ -245,6 +250,7 @@ export function mountCaseLab(root, adapter) {
     } finally {
       running = false;
       if (ui.run) ui.run.disabled = false;
+      if (ui.reset) ui.reset.disabled = false;
       render();
     }
   }
@@ -287,6 +293,7 @@ export function mountCaseLab(root, adapter) {
     button.addEventListener('click', () => handlePrompt(button.dataset.agentQuick));
   }
   ui.history?.addEventListener('click', event => {
+    if (running) return;
     const button = event.target.closest('[data-history-replay]');
     if (!button) return;
     const id = Number(button.dataset.historyReplay);

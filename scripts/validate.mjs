@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { root, readJson } from './lib.mjs';
+import './validate-learning.mjs';
 
 const allowedEpistemic = new Set([
   'FORMAL_RESULT',

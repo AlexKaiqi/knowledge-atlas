@@ -1,6 +1,6 @@
 {
   "name": "knowledge-atlas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,16 +13,24 @@
     "scaffold:knowledge": "node scripts/scaffold-knowledge.mjs",
     "promote:case": "node scripts/promote-case.mjs",
     "publish:knowledge": "node scripts/publish-knowledge.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "validate:learning": "node scripts/validate-learning.mjs",
+    "db:generate": "drizzle-kit generate",
+    "apply:revision": "node scripts/apply-revision.mjs"
   },
   "dependencies": {
     "d3-drag": "3.0.0",
     "d3-force": "3.0.0",
     "d3-selection": "3.0.0",
     "d3-zoom": "3.0.0",
+    "drizzle-orm": "^0.45.2",
     "motion": "13.2.0"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.31.10",
     "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   }
 }

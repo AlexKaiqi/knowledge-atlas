@@ -293,15 +293,15 @@ if (root) {
         <details><summary>它不代表什么 <span>${node.doesNotImply.length}</span></summary><ul>${boundaries}</ul></details>
         <details><summary>工程动作 <span>${node.engineeringImplications.length}</span></summary><ul>${implications}</ul></details>
         <section class="inspector-relations"><small>FOLLOW THE PATH</small><div>${relations}</div></section>
-        <a class="inspector-open" href="${escapeText(node.href)}">阅读完整知识对象 <span>↗</span></a>
+        <a class="inspector-open" href="${escapeText(node.href)}">阅读完整词条 <span>↗</span></a>
       </article>`;
     } else {
       ui.inspector.innerHTML = `<article class="inspector-content">
-        <div class="inspector-top"><span>PROBLEM FIELD</span><b class="${node.status === 'planned' ? 'is-planned' : ''}">${node.status === 'published' ? 'EXECUTABLE' : 'PLANNED'}</b></div>
+        <div class="inspector-top"><span>PROBLEM FIELD</span><b class="${node.status === 'planned' ? 'is-planned' : ''}">${node.status === 'published' ? 'GUIDED' : 'PLANNED'}</b></div>
         <h2>${escapeText(node.title)}</h2><p class="inspector-en">${escapeText(node.titleEn)}</p>
         <blockquote>${escapeText(node.summary)}</blockquote>
         <section class="inspector-relations"><small>KNOWLEDGE IN THIS CASE</small><div>${relations}</div></section>
-        ${node.href ? `<a class="inspector-open" href="${escapeText(node.href)}">进入可执行实验 <span>↗</span></a>` : '<div class="inspector-state"><b>路线图中的实验</b><span>关系已经可探索；完整 Agent Lab 会在 Case 发布后出现。</span></div>'}
+        ${node.href ? `<a class="inspector-open" href="${escapeText(node.href)}">进入问题导学 <span>↗</span></a>` : '<div class="inspector-state"><b>路线图中的实验</b><span>关系已经可探索；完整 Agent Lab 会在 Case 发布后出现。</span></div>'}
       </article>`;
     }
 

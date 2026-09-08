@@ -1,13 +1,13 @@
-import { escapeHtml, shell } from '../components/html.mjs';
+import { escapeHtml, shell } from "../components/html.mjs";
 
 function scriptJson(value) {
-  return JSON.stringify(value).replaceAll('<', '\\u003c');
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
 function asCaseNode(item, status) {
   return {
     key: `case:${item.id}`,
-    kind: 'case',
+    kind: "case",
     id: item.id,
     status,
     category: item.category,
@@ -15,14 +15,14 @@ function asCaseNode(item, status) {
     titleEn: item.subtitle,
     summary: item.hook,
     knowledge: item.knowledge || [],
-    href: status === 'published' ? `../cases/${item.id}/index.html` : null
+    href: status === "published" ? `../cases/${item.id}/index.html` : null,
   };
 }
 
 function asKnowledgeNode(item) {
   return {
     key: `knowledge:${item.id}`,
-    kind: 'knowledge',
+    kind: "knowledge",
     id: item.id,
     status: item.status,
     epistemicType: item.epistemicType,
@@ -33,28 +33,30 @@ function asKnowledgeNode(item) {
     assumptions: item.assumptions,
     doesNotImply: item.doesNotImply,
     engineeringImplications: item.engineeringImplications,
-    href: `../knowledge/${item.id}/index.html`
+    href: `../knowledge/${item.id}/index.html`,
   };
 }
 
-export function renderExplore({ cases, planned, knowledge }) {
-  const caseNodes = [
-    ...cases.map(item => asCaseNode(item, 'published')),
-    ...planned.map(item => asCaseNode(item, 'planned'))
-  ];
+export function renderExplore({ cases, planned, knowledge, questions }) {
+  const caseNodes = questions.map((q) => ({
+    ...asCaseNode({ ...q, subtitle: q.category, hook: q.summary }, "published"),
+    href: `../questions/${q.id}/index.html`,
+  }));
   const knowledgeNodes = knowledge.map(asKnowledgeNode);
   const nodes = [...caseNodes, ...knowledgeNodes];
-  const edges = caseNodes.flatMap(item => item.knowledge.map(knowledgeId => ({
-    source: item.key,
-    target: `knowledge:${knowledgeId}`
-  })));
+  const edges = caseNodes.flatMap((item) =>
+    item.knowledge.map((knowledgeId) => ({
+      source: item.key,
+      target: `knowledge:${knowledgeId}`,
+    })),
+  );
   const data = { schemaVersion: 1, nodes, edges };
   const body = `<section class="atlas-explorer" data-atlas-explorer>
     <script type="application/json" data-atlas-data>${scriptJson(data)}</script>
     <header class="explorer-intro wrap">
       <div>
-        <p class="kicker">Systems field atlas · plate 001</p>
-        <h1>系统研究图谱</h1>
+        <p class="kicker">FOLLOW THE CONNECTIONS</p>
+        <h1>知识之间，也有路。</h1>
       </div>
       <p>从一个真实问题开始。拖动地图、沿连线跳转，观察不同知识如何共同解释同一类系统行为。</p>
     </header>
@@ -84,7 +86,7 @@ export function renderExplore({ cases, planned, knowledge }) {
         <button type="button" data-atlas-suggest="knowledge:pearl-causal-hierarchy"><i>02</i><span><small>DEBUG</small>“改完变好”能证明因果吗？</span></button>
         <button type="button" data-atlas-suggest="knowledge:littles-law"><i>03</i><span><small>CONTROL</small>更多并发为何不一定更快？</span></button>
         <button type="button" data-atlas-suggest="knowledge:simon-stable-intermediates"><i>04</i><span><small>BUILD</small>复杂系统如何逐步长出来？</span></button>
-        <p><b>图例</b><span><i class="case-dot"></i>问题 / Case</span><span><i class="knowledge-dot"></i>知识 / Knowledge</span><span><i class="planned-dot"></i>路线图 / Planned</span></p>
+        <p><b>图例</b><span><i class="case-dot"></i>问题 / Question</span><span><i class="knowledge-dot"></i>知识 / Knowledge</span><span><i class="planned-dot"></i>延伸线索</span></p>
       </aside>
 
       <section class="atlas-map-card" aria-labelledby="atlas-map-title">
@@ -110,14 +112,19 @@ export function renderExplore({ cases, planned, knowledge }) {
         <div class="inspector-empty">
           <span>FIELD NOTE · —</span>
           <h2>选择地图上的一个节点</h2>
-          <p>右侧将成为它的研究批注：定义、边界、工程含义，以及沿关系继续探索的路径。</p>
+          <p>右侧将成为它的理解线索：定义、边界、工程含义，以及沿关系继续探索的路径。</p>
           <div class="inspector-coordinate"><small>ATLAS COORDINATE</small><b>CASE ↔ KNOWLEDGE</b><span>${caseNodes.length} problems · ${knowledgeNodes.length} concepts · ${edges.length} links</span></div>
         </div>
       </aside>
     </div>
-    <noscript><p class="wrap atlas-noscript">关系图需要 JavaScript；你仍可通过导航中的 Knowledge 浏览全部知识对象。</p></noscript>
+    <noscript><p class="wrap atlas-noscript">关系图需要 JavaScript；你仍可通过导航中的 知识百科浏览全部条目。</p></noscript>
   </section>
   <script type="module" src="../assets/explorer.js"></script>`;
 
-  return shell({ title: 'Explore — Knowledge Atlas', body, root: '../', active: 'explore' });
+  return shell({
+    title: "Explore — Knowledge Atlas",
+    body,
+    root: "../",
+    active: "explore",
+  });
 }

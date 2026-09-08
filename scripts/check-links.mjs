@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { root } from './lib.mjs';
 
-const dist = path.join(root, 'dist');
+const dist = path.join(root, 'dist/client');
 
 async function walk(directory) {
   const entries = await fs.readdir(directory, { withFileTypes: true });

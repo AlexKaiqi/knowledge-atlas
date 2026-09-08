@@ -1,56 +1,13 @@
-# Contributing
+# 参与知图共建
 
-Knowledge Atlas accepts two primary contribution types: **Executable Cases** and **Knowledge objects**.
+小贡献可以从一个问题、反例、解释或实验记录开始。完整产品目标见 [PRODUCT.md](PRODUCT.md)。
 
-## Add an Executable Case
+- 网页用户：在探讨区提出问题，或在知识页比较原文与修订、说明理由和来源。提案公开保留，审阅后进入正文。
+- 内容贡献者：阅读 [知识引入检查](docs/KNOWLEDGE_REVIEW.md)，补齐准确知识与科普解释。方法依据见 [调研](docs/LEARNING_METHODS.md)。
+- 开发者：阅读 [ARCHITECTURE.md](ARCHITECTURE.md)，保持公共内容、私人学习、实验快照与待审提案的边界。
 
-Start with:
+提交前运行 `npm run check`。结构通过不代表教学正确；保留人工审阅和试学记录。默认新导学状态为 `editorial-draft`，不虚构学习效果。
 
-```bash
-npm run scaffold:case -- <case-id>
-```
+维护者审阅网页提案后可以导出 JSON，运行 `npm run apply:revision -- <file>`。工具核对基础版本与原文，保留修订理由与作者，更新版本。之后检查差异并发布；过期提案需要重新比较。
 
-A Case is ready for review only when:
-
-1. It starts from an observable engineering problem, not from a theory name.
-2. `semanticGoal` can be checked outside the Agent's own narrative.
-3. At least one Harness control is a meaningful intervention on the Agent's strategy space.
-4. Evidence slots distinguish measurement sources instead of repeating the same oracle.
-5. Changing Harness and re-running can plausibly produce a different trajectory.
-6. The Case runtime uses `Runtime Contract v1`; it does not reimplement the whole page.
-7. Knowledge references are reused rather than copied into Case prose.
-8. `npm run check` passes.
-
-Promote only after review:
-
-```bash
-npm run promote:case -- <case-id>
-```
-
-## Add a Knowledge object
-
-Start with:
-
-```bash
-npm run scaffold:knowledge -- <knowledge-id>
-```
-
-Before publishing:
-
-1. Choose the epistemic type conservatively.
-2. State the claim separately from engineering interpretation.
-3. Declare assumptions.
-4. Declare at least one `doesNotImply` boundary.
-5. Prefer primary / authoritative sources where available.
-6. Do not add decorative equations that do no inferential work.
-7. `npm run check` passes.
-
-Then:
-
-```bash
-npm run publish:knowledge -- <knowledge-id>
-```
-
-## Platform changes
-
-Changes under `site/runtime/core`, `site/pages`, or `scripts` are platform changes. They should solve a capability needed by multiple Cases; do not add Case-specific branches to shared runtime code.
+原有实验继续支持 `scaffold:case` 和 `promote:case`，但并非每个知识问题都需要 Agent。思想练习和直接解释也是有效内容形态。

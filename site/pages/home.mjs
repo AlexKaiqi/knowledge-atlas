@@ -1,25 +1,11 @@
-import { escapeHtml, shell, badge } from '../components/html.mjs';
-
-export function renderHome({cases, planned, knowledgeById}) {
-  const card = (item, published) => {
-    const tags = item.knowledge.slice(0,3).map(id => {
-      const k = knowledgeById.get(id);
-      return k ? `<span>${escapeHtml(k.title)}</span>` : '';
-    }).join('');
-    return `<a class="problem-card ${published?'':'planned'}" href="${published?`cases/${item.id}/index.html`:'#planned'}">
-      <div class="problem-meta"><span>${escapeHtml(item.category)}</span><span>${published?'AGENT LAB':'PLANNED'}</span></div>
-      <h3>${escapeHtml(item.title)}</h3><p class="subtitle">${escapeHtml(item.subtitle)}</p><p>${escapeHtml(item.hook)}</p>
-      <div class="mini-concepts">${tags}</div><div class="problem-foot"><span>${published?'进入 Executable Case':'待扩展'}</span><b>${published?'→':'·'}</b></div>
-    </a>`;
-  };
-
-  const body = `
-  <section class="hero wrap">
-    <div class="hero-copy"><p class="kicker">Interactive knowledge project for agent engineering</p><h1>先遇到问题。<br><em>再让 Agent 在实验里证明方法论。</em></h1><p class="lede">Case、Knowledge、HTML Page、Runtime 都是独立维护对象。每个 Case 都能重放：Run Agent → Observe → Change Harness → Re-run → Verify。</p><div class="hero-actions"><a class="primary" href="explore/index.html">打开知识地图 →</a><a class="secondary" href="cases/tests-green-wrong/index.html">进入 Agent Lab</a></div></div>
-    <div class="hero-loop"><div class="loop-node strong"><span>01</span><b>Problem</b><small>真实异常</small></div><i>→</i><div class="loop-node"><span>02</span><b>Agent</b><small>真实轨迹</small></div><i>→</i><div class="loop-node"><span>03</span><b>Evidence</b><small>外部事实</small></div><i>→</i><div class="loop-node"><span>04</span><b>Theory</b><small>解释与边界</small></div><i>→</i><div class="loop-node"><span>05</span><b>Control</b><small>重跑验证</small></div></div>
-  </section>
-  <section class="manifesto-band"><div class="wrap manifesto-grid"><div><span>CASE</span><b>用例独立扩展</b></div><div><span>KNOWLEDGE</span><b>知识点独立复用</b></div><div><span>PAGE</span><b>统一模板生成</b></div><div><span>RUNTIME</span><b>交互逻辑可插拔</b></div></div></section>
-  <section class="wrap section" id="atlas"><div class="section-head"><div><p class="kicker">Case registry</p><h2>Executable Cases</h2></div><p>首页不硬编码内容。它由 <code>content/cases</code> registry 自动生成。</p></div><div class="problem-grid">${cases.map(c => card(c,true)).join('')}${planned.map(c => card(c,false)).join('')}</div></section>
-  <section class="wrap section"><div class="section-head compact"><div><p class="kicker">Knowledge registry</p><h2>后台知识不是文章目录，而是可被多个 Case 复用的对象。</h2></div></div><div class="legend-grid">${[...knowledgeById.values()].slice(0,6).map(k=>`<a class="knowledge-mini" href="knowledge/${k.id}/index.html">${badge(k.epistemicType)}<h3>${escapeHtml(k.titleZh)}</h3><p>${escapeHtml(k.summary)}</p></a>`).join('')}</div></section>`;
-  return shell({title:'Knowledge Atlas', body, root:'./', active:'problems'});
+import { shell, escapeHtml as e } from "../components/html.mjs";
+import { icon } from "../components/icons.mjs";
+export function questionCard(q, root = "./") {
+  return `<a class="question-card" href="${root}questions/${q.id}/index.html" data-search-item data-category="${e(q.category)}" data-search="${e(q.title + " " + q.category + " " + q.summary)}"><div class="card-top"><span class="topic-icon ${q.color}">${icon(q.icon)}</span><span class="meta">${e(q.category)} · ${e(q.level)}</span>${icon("arrowUp")}</div><h3>${e(q.title)}</h3><p>${e(q.summary)}</p><div class="card-foot"><span>${icon("clock")}${q.minutes} 分钟</span><span>${q.layers.length} 层理解<span class="tiny-dot"></span>动手探索</span></div></a>`;
+}
+export function renderHome({ questions = [], knowledgeById }) {
+  return shell({
+    body: `<div class="page home-page"><section class="welcome"><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h1>从一个好问题，<span>开始理解世界。</span></h1><p>不急着记住答案。先问为什么，再试一试，和他人一起想明白。</p><form class="search-bar" action="./paths/index.html"><label class="sr-only" for="home-search">搜索问题或知识</label>${icon("search")}<input id="home-search" name="q" type="search" placeholder="你对什么感到好奇？搜索问题、概念或关键词" autocomplete="off"><button type="submit">探索 ${icon("arrow")}</button></form><div class="search-suggestions"><span>试着问</span><a href="questions/tests-green-wrong/index.html">AI 说的就一定对吗？</a><a href="questions/causal-false-positive/index.html">相关就意味着因果吗？</a><a href="questions/too-many-agents/index.html">人多真的力量大吗？</a></div></section><div class="home-columns"><div><section class="featured-section"><div class="section-title"><h2>从这里开始</h2><span class="meta">不需要预备知识</span></div><a class="featured" href="questions/tests-green-wrong/index.html"><div class="feature-copy"><div class="feature-label"><span></span>第一段探索 · AI 与判断</div><h2>答案看起来都对，<br>为什么还是不可信？</h2><p>从一次“测试全绿”的失败出发，学会区分漂亮的答案和可靠的证据。</p><div class="feature-steps"><span>先猜一猜</span><i>→</i><span>动手验证</span><i>→</i><span>理解原理</span></div><span class="feature-cta">开始探索 ${icon("arrow")}<small>约 12 分钟</small></span></div><div class="evidence-diagram" aria-label="预测通过，需要比较指标与真实结果"><div class="diagram-note">一次小小的求证</div><div class="diagram-node">任务完成了吗？</div><div class="diagram-branches"><div><span>看指标</span><b class="diagram-pass">${icon("check")}测试通过</b></div><div><span>查证据</span><b class="diagram-query">${icon("search")}真的做到了？</b></div></div><div class="diagram-end">答案，藏在两者的差别里。</div></div></a></section><section class="questions-section"><div class="section-title"><h2>值得追问的问题</h2><a href="paths/index.html">全部问题 ${icon("arrow")}</a></div><div class="filter-row" role="group" aria-label="筛选问题主题"><button class="filter active" data-filter="all" aria-pressed="true">全部</button>${["AI 与判断", "系统与协作", "思考与推理"].map((x) => `<button class="filter" data-filter="${x}" aria-pressed="false">${x}</button>`).join("")}</div><div class="question-grid">${questions.map((q) => questionCard(q)).join("")}</div><p data-search-empty hidden class="empty-state">还没有这个主题的问题。你可以在共建区提出一个。</p></section></div><aside class="home-aside"><section class="start-note"><div class="aside-icon">${icon("route")}</div><h3>找到适合你的起点</h3><p>跟随一条问题线索，<br>也可以在好奇的地方停留。</p><a href="paths/index.html">挑选学习路径 ${icon("arrow")}</a><div class="path-preview"><span><i>01</i>看见问题</span><span><i>02</i>建立直觉</span><span><i>03</i>动手求证</span><span><i>04</i>带走理解</span></div></section><section class="aside-section"><span class="eyebrow">LEARN HOW TO LEARN</span><h3>“看懂了”之后，<br>再问自己一步。</h3><p>合上解释，用自己的话说一遍。哪里说不清，哪里就值得再探索。</p><a href="method/index.html">为什么这样学 ${icon("arrowUp")}</a></section><section class="aside-section wiki-note"><div class="section-title"><h3>一份生长中的百科</h3>${icon("book")}</div><p>这里的每个解释，都可以被补充、追问和修正。</p><div class="wiki-stats"><b>${knowledgeById.size}</b><span>个有来源的知识条目</span></div><a href="knowledge/index.html">随意翻开一页 ${icon("arrow")}</a></section></aside></div><section class="contribute-band"><span class="contribute-symbol">${icon("chat")}</span><div><h3>一个人的疑问，可能是很多人的起点。</h3><p>提个问题、分享一次实验，或让一个解释更清楚。你不必是专家。</p></div><a class="button" href="contribute/index.html">参与共建 ${icon("arrow")}</a></section></div>`,
+    active: "home",
+  });
 }

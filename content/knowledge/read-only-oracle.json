@@ -17,6 +17,12 @@
     "测试文件、验收阈值、关键 fixture 不属于 executor 的写空间",
     "引入外部 observer 检查真实状态"
   ],
-  "sources": [],
-  "status": "published"
+  "sources": [
+    {
+      "label": "Saltzer & Schroeder (1975), The Protection of Information in Computer Systems；提供权限隔离的设计背景，本条具体策略仍需针对验收目标验证",
+      "url": "https://web.mit.edu/Saltzer/www/publications/protection/"
+    }
+  ],
+  "status": "published",
+  "version": 1
 }

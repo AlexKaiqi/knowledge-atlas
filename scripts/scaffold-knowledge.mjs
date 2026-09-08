@@ -16,6 +16,7 @@ try {
 
 const item = {
   id,
+  version: 1,
   status: 'draft',
   title: 'TODO English title',
   titleZh: 'TODO 中文标题',
